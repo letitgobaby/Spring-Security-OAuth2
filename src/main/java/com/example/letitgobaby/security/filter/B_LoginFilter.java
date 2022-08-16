@@ -7,29 +7,36 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
+
+@Component
+// @RequiredArgsConstructor
 public class B_LoginFilter extends AbstractAuthenticationProcessingFilter {
 
-  public B_LoginFilter(RequestMatcher requiresAuthenticationRequestMatcher) {
-    super(requiresAuthenticationRequestMatcher);
-  }
+  static final String requestMatcher = "/b/login";
 
-  @Override
-  public void setAuthenticationManager(AuthenticationManager authenticationManager) {
-    // TODO Auto-generated method stub
-    super.setAuthenticationManager(authenticationManager);
+  public B_LoginFilter(AuthenticationManager authenticationManager) {
+    super(requestMatcher, authenticationManager);
   }
 
   @Override
   public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
       throws AuthenticationException, IOException, ServletException {
+    
+        System.out.println("\n\n");
+        System.out.println("filter !!!!");
+        System.out.println("\n\n");
     // TODO Auto-generated method stub
-    return null;
+    return super.getAuthenticationManager().authenticate(null);
   }
 
   @Override

@@ -15,10 +15,11 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 public class User {
   
   @Id
+  @Column(name = "id")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
@@ -28,11 +29,11 @@ public class User {
   @Column(name = "password")
   private String password;
 
-  @Column(name = "name")
-  private String name;
+  @Column(name = "user_name")
+  private String userName;
 
-  @Column(name = "role")
-  private String role;
+  @Column(name = "user_role")
+  private String userRole;
 
   @CreationTimestamp
   @Column(name = "created_at")

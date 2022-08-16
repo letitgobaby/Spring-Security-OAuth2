@@ -45,7 +45,5 @@ public class A_LoginFilter extends AbstractAuthenticationProcessingFilter {
     // TODO Auto-generated method stub
     super.unsuccessfulAuthentication(request, response, failed);
   }
-
-
   
 }
