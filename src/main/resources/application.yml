@@ -28,7 +28,9 @@ spring:
     init:
       mode: always
 
-
+app:
+  jwt:
+    secret: letitgobaby
 
 logging:
   level:
@@ -37,3 +39,4 @@ logging:
         security:
           web:
             FilterChainProxy: DEBUG
+

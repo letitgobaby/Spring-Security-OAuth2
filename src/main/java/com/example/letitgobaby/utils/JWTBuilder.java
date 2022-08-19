@@ -1,0 +1,54 @@
+package com.example.letitgobaby.utils;
+
+import java.util.Date;
+import java.util.Map;
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.Claim;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+public class JWTBuilder {
+  
+  private String issuer = "letitgobaby";
+  private Algorithm algorithm;
+  private int accessTime;
+  private int refreshTime;
+
+  public JWTBuilder(String secret, int accessTime, int refreshTime) {
+    this.algorithm = Algorithm.HMAC256(secret);
+    this.accessTime = accessTime;
+    this.refreshTime = refreshTime;
+  }
+
+  public String accessGenerate(Object obj) throws Exception {
+    return JWT.create()
+        .withIssuer(this.issuer)
+        .withClaim("userInfo", new ObjectMapper().convertValue(obj, Map.class))
+        .withExpiresAt(getExpireTime(this.accessTime))
+        .sign(this.algorithm);
+  }
+
+  public String refreshGenerate(Object obj) throws Exception {
+    return JWT.create()
+        .withIssuer(this.issuer)
+        .withClaim("userInfo", new ObjectMapper().convertValue(obj, Map.class))
+        .withExpiresAt(getExpireTime(this.refreshTime))
+        .sign(this.algorithm);
+  }
+
+  public Claim getClaim(String token, String claimKey) {
+    DecodedJWT decodedJWT = JWT.decode(token);
+    return decodedJWT.getClaims().get(claimKey);
+  }
+
+  private Date getExpireTime(int timeProperty) {
+    long expireDate = new Date().getTime() + (timeProperty * 60 * 1000);
+    return new Date(expireDate);
+  }
+
+}

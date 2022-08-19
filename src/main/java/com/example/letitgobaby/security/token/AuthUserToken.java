@@ -8,23 +8,37 @@ import org.springframework.security.core.GrantedAuthority;
 public class AuthUserToken extends AbstractAuthenticationToken {
 
   private String userId;
-  
-  private String name;
+  private String pswd;
 
-  public AuthUserToken(Collection<? extends GrantedAuthority> authorities) {
+  private String accessToken;
+  private String refreshToken;
+
+  public AuthUserToken(String userId, String pswd) {
+    super(null);
+    super.setAuthenticated(false);
+    this.userId = userId;
+    this.pswd = pswd;
+  }
+
+  public AuthUserToken(String userId, Collection<? extends GrantedAuthority> authorities) {
     super(authorities);
+    super.setAuthenticated(true);
+    this.userId = userId;
   }
 
   @Override
-  public Object getCredentials() {
-    // TODO Auto-generated method stub
-    return null;
+  public String getPrincipal() {
+    return this.userId;
   }
 
   @Override
-  public Object getPrincipal() {
-    // TODO Auto-generated method stub
-    return null;
+  public String getCredentials() {
+    return this.pswd;
+  }
+
+  public void setToken(String aToken, String rToken) {
+    this.accessToken = aToken;
+    this.refreshToken = rToken;
   }
 
 }

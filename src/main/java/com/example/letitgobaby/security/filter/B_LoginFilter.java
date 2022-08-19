@@ -7,49 +7,44 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.springframework.stereotype.Component;
 
-import lombok.RequiredArgsConstructor;
+import com.example.letitgobaby.security.token.AuthUserToken;
 
-@Component
-// @RequiredArgsConstructor
+import lombok.extern.slf4j.Slf4j;
+
+
+@Slf4j
 public class B_LoginFilter extends AbstractAuthenticationProcessingFilter {
 
-  static final String requestMatcher = "/b/login";
-
-  public B_LoginFilter(AuthenticationManager authenticationManager) {
+  public B_LoginFilter(RequestMatcher requestMatcher, AuthenticationManager authenticationManager) {
     super(requestMatcher, authenticationManager);
   }
 
   @Override
-  public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
-      throws AuthenticationException, IOException, ServletException {
-    
-        System.out.println("\n\n");
-        System.out.println("filter !!!!");
-        System.out.println("\n\n");
-    // TODO Auto-generated method stub
-    return super.getAuthenticationManager().authenticate(null);
+  public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
+    String id = request.getParameter("id");
+    String pw = request.getParameter("pw");
+
+    AuthUserToken authentication = new AuthUserToken(id, pw);
+    return super.getAuthenticationManager().authenticate(authentication);
   }
 
   @Override
   protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
       Authentication authResult) throws IOException, ServletException {
-    // TODO Auto-generated method stub
+    log.info("# B_LoginFilter - successfulAuthentication #");
     super.successfulAuthentication(request, response, chain, authResult);
   }
 
   @Override
   protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
       AuthenticationException failed) throws IOException, ServletException {
-    // TODO Auto-generated method stub
+    log.info("# B_LoginFilter - unsuccessfulAuthentication #", failed.getMessage());
     super.unsuccessfulAuthentication(request, response, failed);
   }
   

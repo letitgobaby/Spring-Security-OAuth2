@@ -1,6 +1,7 @@
 package com.example.letitgobaby.security.filter;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -12,37 +13,42 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.util.StreamUtils;
 
+import com.example.letitgobaby.security.dto.LoginInfoPayload;
+import com.example.letitgobaby.security.token.AuthUserToken;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class A_LoginFilter extends AbstractAuthenticationProcessingFilter {
 
-  public A_LoginFilter(RequestMatcher requiresAuthenticationRequestMatcher) {
-    super(requiresAuthenticationRequestMatcher);
-  }
-
-  @Override
-  public void setAuthenticationManager(AuthenticationManager authenticationManager) {
-    // TODO Auto-generated method stub
-    super.setAuthenticationManager(authenticationManager);
+  public A_LoginFilter(RequestMatcher requestMatcher, AuthenticationManager authenticationManager) {
+    super(requestMatcher, authenticationManager);
   }
 
   @Override
   public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
       throws AuthenticationException, IOException, ServletException {
-    // TODO Auto-generated method stub
-    return null;
+    String requestBody = StreamUtils.copyToString(request.getInputStream(), Charset.forName("UTF-8"));
+    LoginInfoPayload paylod = new ObjectMapper().readValue(requestBody, LoginInfoPayload.class);
+
+    AuthUserToken authentication = new AuthUserToken(paylod.getUserId(), paylod.getPswd());
+    return super.getAuthenticationManager().authenticate(authentication);
   }
 
   @Override
   protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
       Authentication authResult) throws IOException, ServletException {
-    // TODO Auto-generated method stub
+    log.info("# A_LoginFilter - successfulAuthentication #");
     super.successfulAuthentication(request, response, chain, authResult);
   }
 
   @Override
   protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
       AuthenticationException failed) throws IOException, ServletException {
-    // TODO Auto-generated method stub
+    log.info("# A_LoginFilter - unsuccessfulAuthentication #");
     super.unsuccessfulAuthentication(request, response, failed);
   }
   
