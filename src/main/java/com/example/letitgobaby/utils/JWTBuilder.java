@@ -27,18 +27,18 @@ public class JWTBuilder {
 
   public String accessGenerate(Object obj) throws Exception {
     return JWT.create()
-        .withIssuer(this.issuer)
-        .withClaim("userInfo", new ObjectMapper().convertValue(obj, Map.class))
-        .withExpiresAt(getExpireTime(this.accessTime))
-        .sign(this.algorithm);
+      .withIssuer(this.issuer)
+      .withClaim("userInfo", new ObjectMapper().convertValue(obj, Map.class))
+      .withExpiresAt(getExpireTime(this.accessTime))
+      .sign(this.algorithm);
   }
 
   public String refreshGenerate(Object obj) throws Exception {
     return JWT.create()
-        .withIssuer(this.issuer)
-        .withClaim("userInfo", new ObjectMapper().convertValue(obj, Map.class))
-        .withExpiresAt(getExpireTime(this.refreshTime))
-        .sign(this.algorithm);
+      .withIssuer(this.issuer)
+      .withClaim("userInfo", new ObjectMapper().convertValue(obj, Map.class))
+      .withExpiresAt(getExpireTime(this.refreshTime))
+      .sign(this.algorithm);
   }
 
   public Claim getClaim(String token, String claimKey) {

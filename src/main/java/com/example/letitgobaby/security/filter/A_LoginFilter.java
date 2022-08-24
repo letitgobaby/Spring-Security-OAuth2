@@ -41,14 +41,14 @@ public class A_LoginFilter extends AbstractAuthenticationProcessingFilter {
   @Override
   protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
       Authentication authResult) throws IOException, ServletException {
-    log.info("# A_LoginFilter - successfulAuthentication #");
-    super.successfulAuthentication(request, response, chain, authResult);
+    log.info("# A_LoginFilter - successfulAuthentication # " + authResult.getPrincipal());
+    super.getSuccessHandler().onAuthenticationSuccess(request, response, authResult);
   }
 
   @Override
   protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
       AuthenticationException failed) throws IOException, ServletException {
-    log.info("# A_LoginFilter - unsuccessfulAuthentication #");
+    log.info("# A_LoginFilter - unsuccessfulAuthentication #", failed.getMessage());
     super.unsuccessfulAuthentication(request, response, failed);
   }
   

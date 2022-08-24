@@ -39,6 +39,7 @@ import com.example.letitgobaby.security.filter.JwtVerifyFilter;
 import com.example.letitgobaby.security.filter.dsl.FilterBuilderDsl;
 import com.example.letitgobaby.security.provider.A_LoginProvider;
 import com.example.letitgobaby.security.provider.JwtVerifyProvider;
+import com.example.letitgobaby.security.provider.LoginProcessProvider;
 
 import lombok.RequiredArgsConstructor;
 
@@ -47,10 +48,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
   
-  private final String[] RESOURCE_URL = new String[] { "/static/**", "/static/css/**", "/js/**", "/images/**","/vendor/**","/fonts/**" };
-  private final String[] PERMIT_URL = new String[] { "/login", "/user/login", "/b/login", "/fail", "/test", "/h2", "/h2/**", };
+  private final String[] RESOURCE_URL = new String[] { "/static/**", "/favicon.ico", "/js/**", "/images/**", "/css/**", "/fonts/**" };
+  private final String[] PERMIT_URL = new String[] { "/login", "/a/login", "/b/login", "/fail", "/test", "/h2", "/h2/**", "/user/test" };
 
-  private final A_LoginProvider aLoginProvider;
+  // private final A_LoginProvider aLoginProvider;
+  private final LoginProcessProvider loginProvider;
   private final JwtVerifyProvider jwtProvider;
   
   @Bean
@@ -94,7 +96,7 @@ public class SecurityConfig {
   @Bean
   public AuthenticationManager authenticationManager() throws Exception {
     List<AuthenticationProvider> list = Arrays.asList(
-      aLoginProvider,
+      loginProvider,
       jwtProvider
     );
     return new ProviderManager(list);

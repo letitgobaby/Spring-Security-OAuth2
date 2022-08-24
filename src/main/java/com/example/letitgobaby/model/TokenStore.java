@@ -1,15 +1,11 @@
 package com.example.letitgobaby.model;
 
-import java.time.LocalDateTime;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.CreationTimestamp;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,8 +15,8 @@ import lombok.NoArgsConstructor;
 @Data @Builder
 @AllArgsConstructor @NoArgsConstructor
 @Entity
-@Table(name = "users")
-public class User {
+@Table(name = "token_store")
+public class TokenStore {
   
   @Id
   @Column(name = "id")
@@ -30,17 +26,10 @@ public class User {
   @Column(name = "user_id")
   private String userId;
 
-  @Column(name = "password")
-  private String password;
+  @Column(name = "object_key")
+  private String objectKey;
 
-  @Column(name = "user_name")
-  private String userName;
-
-  @Column(name = "user_role")
-  private String userRole;
-
-  @CreationTimestamp
-  @Column(name = "created_at")
-  private LocalDateTime createdAt;
+  @Column(name = "object_value")
+  private String objectValue;
 
 }

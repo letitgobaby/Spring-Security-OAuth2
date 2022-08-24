@@ -10,7 +10,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import com.example.letitgobaby.security.token.AuthUserToken;
@@ -34,15 +36,19 @@ public class B_LoginFilter extends AbstractAuthenticationProcessingFilter {
     return super.getAuthenticationManager().authenticate(authentication);
   }
 
-  @Override
-  protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
-      Authentication authResult) throws IOException, ServletException {
-    log.info("# B_LoginFilter - successfulAuthentication #");
-    super.successfulAuthentication(request, response, chain, authResult);
+  public void setSuccessHandler(AuthenticationSuccessHandler successHandler) {
+    super.setAuthenticationSuccessHandler(successHandler);
   }
 
   @Override
-  protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
+  public void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
+      Authentication authResult) throws IOException, ServletException {
+    log.info("# B_LoginFilter - successfulAuthentication # " + authResult.getPrincipal());
+    super.getSuccessHandler().onAuthenticationSuccess(request, response, authResult);
+  }
+
+  @Override
+  public void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
       AuthenticationException failed) throws IOException, ServletException {
     log.info("# B_LoginFilter - unsuccessfulAuthentication #", failed.getMessage());
     super.unsuccessfulAuthentication(request, response, failed);

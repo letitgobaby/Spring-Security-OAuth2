@@ -10,6 +10,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import com.example.letitgobaby.app.tokenStore.TokenStoreService;
+import com.example.letitgobaby.model.TokenStore;
+import com.example.letitgobaby.model.TokenStoreRepository;
 import com.example.letitgobaby.model.User;
 import com.example.letitgobaby.model.UserRepository;
 import com.example.letitgobaby.security.dto.UserInfo;
@@ -25,7 +28,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class LoginProcessProvider implements AuthenticationProvider {
   
+  
   private final UserRepository userRepository;
+  private final TokenStoreService tStoreService;
   private final JWTBuilder jwtBuilder;
   private final PasswordEncoder encoder;
   
@@ -44,7 +49,7 @@ public class LoginProcessProvider implements AuthenticationProvider {
     try {
       UserInfo userInfo = new UserInfo().toDto(user);
       String accessToken = this.jwtBuilder.accessGenerate(userInfo);
-      String refreshToken = this.jwtBuilder.refreshGenerate(userInfo);
+      String refreshToken = this.tStoreService.setKeyValue(userInfo);
 
       AuthUserToken auth = new AuthUserToken(user.getUserId(), user.getUserRole());
       auth.setToken(accessToken, refreshToken);

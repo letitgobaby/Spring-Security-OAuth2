@@ -13,6 +13,8 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import com.example.letitgobaby.security.filter.A_LoginFilter;
 import com.example.letitgobaby.security.filter.B_LoginFilter;
 import com.example.letitgobaby.security.filter.JwtVerifyFilter;
+import com.example.letitgobaby.security.handler.LoginFailureHandler;
+import com.example.letitgobaby.security.handler.LoginSuccessHandler;
 
 
 public class FilterBuilderDsl extends AbstractHttpConfigurer<FilterBuilderDsl, HttpSecurity> {
@@ -30,13 +32,19 @@ public class FilterBuilderDsl extends AbstractHttpConfigurer<FilterBuilderDsl, H
   public Filter a_LoginFilter(AuthenticationManager authenticationManager) {
     String LOGIN_URL = "/a/login";
     RequestMatcher login_requestMatcher = new AntPathRequestMatcher(LOGIN_URL, HttpMethod.POST.name());
-    return new A_LoginFilter(login_requestMatcher, authenticationManager);
+    A_LoginFilter filter = new A_LoginFilter(login_requestMatcher, authenticationManager);
+    filter.setAuthenticationSuccessHandler(new LoginSuccessHandler());
+    filter.setAuthenticationFailureHandler(new LoginFailureHandler());
+    return filter;
   }
 
   public Filter b_LoginFilter(AuthenticationManager authenticationManager) {
     String LOGIN_URL = "/b/login";
-    RequestMatcher login_requestMatcher = new AntPathRequestMatcher(LOGIN_URL, HttpMethod.POST.name());
-    return new B_LoginFilter(login_requestMatcher, authenticationManager);
+    RequestMatcher login_requestMatcher = new AntPathRequestMatcher(LOGIN_URL, HttpMethod.GET.name());
+    B_LoginFilter filter = new B_LoginFilter(login_requestMatcher, authenticationManager);
+    filter.setAuthenticationSuccessHandler(new LoginSuccessHandler());
+    filter.setAuthenticationFailureHandler(new LoginFailureHandler());
+    return filter;
   }
 
   public Filter jwtFilter(AuthenticationManager authenticationManager) {

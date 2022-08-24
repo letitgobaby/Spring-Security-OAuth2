@@ -41,4 +41,12 @@ public class AuthUserToken extends AbstractAuthenticationToken {
     this.refreshToken = rToken;
   }
 
+  public String getAccessToken() {
+    return this.accessToken;
+  }
+
+  public String getRefreshToken() {
+    return this.refreshToken;
+  }
+
 }
