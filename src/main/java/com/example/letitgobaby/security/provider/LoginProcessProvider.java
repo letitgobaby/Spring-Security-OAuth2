@@ -28,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class LoginProcessProvider implements AuthenticationProvider {
   
-  
   private final UserRepository userRepository;
   private final TokenStoreService tStoreService;
   private final JWTBuilder jwtBuilder;
@@ -36,6 +35,7 @@ public class LoginProcessProvider implements AuthenticationProvider {
   
   @Override
   public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+    log.info("## do LoginProcessProvider ##");
     String userId = (String) authentication.getPrincipal();
     String pswd = (String) authentication.getCredentials();
 

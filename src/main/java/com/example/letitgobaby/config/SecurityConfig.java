@@ -37,21 +37,22 @@ import com.example.letitgobaby.security.filter.A_LoginFilter;
 import com.example.letitgobaby.security.filter.B_LoginFilter;
 import com.example.letitgobaby.security.filter.JwtVerifyFilter;
 import com.example.letitgobaby.security.filter.dsl.FilterBuilderDsl;
-import com.example.letitgobaby.security.provider.A_LoginProvider;
+import com.example.letitgobaby.security.handler.LoginFailureHandler;
+import com.example.letitgobaby.security.handler.LoginSuccessHandler;
 import com.example.letitgobaby.security.provider.JwtVerifyProvider;
 import com.example.letitgobaby.security.provider.LoginProcessProvider;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-// @Configuration
+@Slf4j
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
   
   private final String[] RESOURCE_URL = new String[] { "/static/**", "/favicon.ico", "/js/**", "/images/**", "/css/**", "/fonts/**" };
-  private final String[] PERMIT_URL = new String[] { "/login", "/a/login", "/b/login", "/fail", "/test", "/h2", "/h2/**", "/user/test" };
+  private final String[] PERMIT_URL = new String[] { "/", "/login", "/a/login", "/b/login", "/fail", "/test", "/h2", "/h2/**", "/user/test" };
 
-  // private final A_LoginProvider aLoginProvider;
   private final LoginProcessProvider loginProvider;
   private final JwtVerifyProvider jwtProvider;
   
@@ -77,30 +78,58 @@ public class SecurityConfig {
       })
       .exceptionHandling()
       .authenticationEntryPoint((req, res, ex) -> {
+        log.error(ex.getMessage());
         res.sendError(HttpServletResponse.SC_FORBIDDEN, ex.getMessage());
       })
       .accessDeniedHandler((req, res, ex) -> {
+        log.error(ex.getMessage());
         res.sendError(HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage());
       });
 
-    http.apply(filterBuilderDsl());
+
+    AuthenticationManagerBuilder authManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
+    AuthenticationManager aManager = toProviders(authManagerBuilder);
+    http.authenticationManager(aManager);
+
+    http.addFilterBefore(a_LoginFilter(aManager), UsernamePasswordAuthenticationFilter.class);
+    http.addFilterBefore(b_LoginFilter(aManager), UsernamePasswordAuthenticationFilter.class);
+    http.addFilterAt(jwtFilter(aManager), UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }
 
-  @Bean
-  public FilterBuilderDsl filterBuilderDsl() {
-    return new FilterBuilderDsl();
+
+  public Filter a_LoginFilter(AuthenticationManager authenticationManager) {
+    String LOGIN_URL = "/a/login";
+    RequestMatcher login_requestMatcher = new AntPathRequestMatcher(LOGIN_URL, HttpMethod.POST.name());
+    A_LoginFilter filter = new A_LoginFilter(login_requestMatcher, authenticationManager);
+    filter.setAuthenticationSuccessHandler(new LoginSuccessHandler());
+    filter.setAuthenticationFailureHandler(new LoginFailureHandler());
+    return filter;
   }
 
-  @Bean
-  public AuthenticationManager authenticationManager() throws Exception {
-    List<AuthenticationProvider> list = Arrays.asList(
-      loginProvider,
-      jwtProvider
-    );
-    return new ProviderManager(list);
+  public Filter b_LoginFilter(AuthenticationManager authenticationManager) {
+    String LOGIN_URL = "/b/login";
+    RequestMatcher login_requestMatcher = new AntPathRequestMatcher(LOGIN_URL, HttpMethod.GET.name());
+    B_LoginFilter filter = new B_LoginFilter(login_requestMatcher, authenticationManager);
+    filter.setAuthenticationSuccessHandler(new LoginSuccessHandler());
+    filter.setAuthenticationFailureHandler(new LoginFailureHandler());
+    return filter;
   }
+
+  public Filter jwtFilter(AuthenticationManager authenticationManager) {
+    JwtVerifyFilter filter = new JwtVerifyFilter();
+    filter.setAuthenticationManager(authenticationManager);
+    return filter;
+  }
+
+  public AuthenticationManager toProviders(AuthenticationManagerBuilder builder) throws Exception {
+    builder.authenticationProvider(loginProvider);
+    builder.authenticationProvider(jwtProvider);
+
+    return builder.eraseCredentials(true).build();
+  }
+
 
   @Bean
   public CorsFilter corsFilter() {
