@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.Map;
 
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
@@ -16,6 +17,7 @@ public class JWTBuilder {
   
   private String issuer = "letitgobaby";
   private Algorithm algorithm;
+  private JWTVerifier verifier;
   private int accessTime;
   private int refreshTime;
 
@@ -23,6 +25,7 @@ public class JWTBuilder {
     this.algorithm = Algorithm.HMAC256(secret);
     this.accessTime = accessTime;
     this.refreshTime = refreshTime;
+    this.verifier = JWT.require(algorithm).withIssuer(this.issuer).build(); 
   }
 
   public String accessGenerate(Object obj) throws Exception {
@@ -39,6 +42,12 @@ public class JWTBuilder {
       .withClaim("userInfo", new ObjectMapper().convertValue(obj, Map.class))
       .withExpiresAt(getExpireTime(this.refreshTime))
       .sign(this.algorithm);
+  }
+
+  public Boolean validate(String token) throws Exception {
+    DecodedJWT jwt = this.verifier.verify(token);
+    String issuer = jwt.getIssuer();
+    return issuer != null ? true : false;
   }
 
   public Claim getClaim(String token, String claimKey) {

@@ -27,26 +27,15 @@ public class JwtVerifyFilter extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
-    System.out.println("\n\n");
-    System.out.println("JwtVerifyFilter !!!!!!!!!");
-    System.out.println("\n\n");
+    log.info("## JwtVerifyFilter ##");
 
     String authorization = getAuthorization(request);
+
     if (authorization != null) {
       JwtToken token = new JwtToken(authorization);
       Authentication authentication = this.authenticationManager.authenticate(token);
       SecurityContextHolder.getContext().setAuthentication(authentication);
     }
-
-  // try {
-
-  //   JwtToken token = new JwtToken(null);
-
-  //   Authentication authentication = this.authenticationManager.authenticate(token);
-  //   SecurityContextHolder.getContext().setAuthentication(authentication);
-  // } catch (Exception e) {
-  //   log.error(e.getMessage());
-  // }
 
     chain.doFilter(request, response);
   }

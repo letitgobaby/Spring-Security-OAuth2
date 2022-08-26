@@ -12,31 +12,37 @@ import com.auth0.jwt.interfaces.Claim;
 import com.example.letitgobaby.model.User;
 import com.example.letitgobaby.model.UserRepository;
 import com.example.letitgobaby.security.dto.UserInfo;
+import com.example.letitgobaby.security.exception.JwtAuthenticationException;
+import com.example.letitgobaby.security.token.AuthUserToken;
 import com.example.letitgobaby.security.token.JwtToken;
 import com.example.letitgobaby.utils.JWTBuilder;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtVerifyProvider implements AuthenticationProvider {
   
-  private final UserRepository userRepository;
   private final JWTBuilder jwtBuilder;
 
   @Override
   public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-    String token = (String) authentication.getPrincipal();
-    Claim cliam = this.jwtBuilder.getClaim(token, "userInfo");
-    UserInfo userInfo = cliam.as(UserInfo.class);
+    try {
+      String token = (String) authentication.getPrincipal();
+      if (token != null && this.jwtBuilder.validate(token)) {
+        Claim cliam = this.jwtBuilder.getClaim(token, "userInfo");
+        UserInfo userInfo = cliam.as(UserInfo.class);
 
-    Optional<User> user = this.userRepository.findByUserId(userInfo.getUserId());
-    if (!user.isPresent()) {
+        return new AuthUserToken(userInfo.getUserId(), userInfo.getUserRole());
+      }
+
       return null;
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      throw new JwtAuthenticationException(e.getMessage());
     }
-
-    
-    return null;
   }
 
   @Override
