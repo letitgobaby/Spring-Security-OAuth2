@@ -1,29 +1,16 @@
 package com.example.letitgobaby.config;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import javax.servlet.Filter;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -32,16 +19,16 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import com.example.letitgobaby.model.UserRepository;
 import com.example.letitgobaby.security.filter.A_LoginFilter;
 import com.example.letitgobaby.security.filter.B_LoginFilter;
 import com.example.letitgobaby.security.filter.JwtVerifyFilter;
 import com.example.letitgobaby.security.filter.RefreshTokenFilter;
-import com.example.letitgobaby.security.filter.dsl.FilterBuilderDsl;
+import com.example.letitgobaby.security.handler.JwtFailureHandler;
 import com.example.letitgobaby.security.handler.LoginFailureHandler;
 import com.example.letitgobaby.security.handler.LoginSuccessHandler;
 import com.example.letitgobaby.security.provider.JwtVerifyProvider;
 import com.example.letitgobaby.security.provider.LoginProcessProvider;
+import com.example.letitgobaby.security.provider.ReGenerateTokenProvider;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,6 +43,7 @@ public class SecurityConfig {
 
   private final LoginProcessProvider loginProvider;
   private final JwtVerifyProvider jwtProvider;
+  private final ReGenerateTokenProvider regenProvider;
   
   @Bean
   public WebSecurityCustomizer webSecurityCustomizer() {
@@ -132,12 +120,14 @@ public class SecurityConfig {
   public Filter jwtFilter(AuthenticationManager authenticationManager) {
     JwtVerifyFilter filter = new JwtVerifyFilter();
     filter.setAuthenticationManager(authenticationManager);
+    filter.setAuthenticationFailureHandler(new JwtFailureHandler());
     return filter;
   }
 
   public AuthenticationManager toProviders(AuthenticationManagerBuilder builder) throws Exception {
     builder.authenticationProvider(loginProvider);
     builder.authenticationProvider(jwtProvider);
+    builder.authenticationProvider(regenProvider);
 
     return builder.eraseCredentials(true).build();
   }

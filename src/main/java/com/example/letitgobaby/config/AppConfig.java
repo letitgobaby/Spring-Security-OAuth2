@@ -18,7 +18,7 @@ public class AppConfig {
 
   @Bean
   public JWTBuilder jwtBuilder(@Value("${app.jwt.secret}") String secret) {
-    int aTime = 10; // 10분
+    int aTime = 1; // 1분
     int rTime = 48 * 60; // 48시간
     return new JWTBuilder(secret, aTime, rTime);
   }

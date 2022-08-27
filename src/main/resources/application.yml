@@ -32,11 +32,11 @@ app:
   jwt:
     secret: letitgobaby
 
-logging:
-  level:
-    org:
-      springframework:
-        security:
-          web:
-            FilterChainProxy: DEBUG
+# logging:
+#   level:
+#     org:
+#       springframework:
+#         security:
+#           web:
+#             FilterChainProxy: DEBUG
 

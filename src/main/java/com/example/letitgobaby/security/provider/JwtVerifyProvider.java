@@ -39,8 +39,6 @@ public class JwtVerifyProvider implements AuthenticationProvider {
     try {
       JwtToken jwtToken = (JwtToken) authentication;
       String token = jwtToken.getPrincipal();
-      
-      log.info(" -- JwtVerifyProvider -- " + token);
 
       if (this.jwtBuilder.validate(token)) {
         UserInfo userInfo = this.jwtBuilder.getClaim(token, "userInfo").as(UserInfo.class);
@@ -55,7 +53,7 @@ public class JwtVerifyProvider implements AuthenticationProvider {
 
       return null;
     } catch (TokenExpiredException e) {
-      throw new LoginAuthenticationException(e.getMessage());
+      throw new JwtAuthenticationException(e.getMessage());
     } catch (Exception e) {
       throw new JwtAuthenticationException(e.getMessage());
     }

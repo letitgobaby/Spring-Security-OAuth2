@@ -9,9 +9,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.example.letitgobaby.security.exception.LoginAuthenticationException;
 import com.example.letitgobaby.security.token.JwtToken;
 
 import lombok.extern.slf4j.Slf4j;
@@ -20,21 +23,29 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtVerifyFilter extends OncePerRequestFilter {
 
   private AuthenticationManager authenticationManager;
+  private AuthenticationEntryPoint authenticationEntryPoint;
 
   public void setAuthenticationManager(AuthenticationManager authenticationManager) {
     this.authenticationManager = authenticationManager;
   }
 
+  public void setAuthenticationFailureHandler(AuthenticationEntryPoint entryPoint) {
+    this.authenticationEntryPoint = entryPoint;
+  }
+
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
     log.info("## JwtVerifyFilter ##");
+    try {
+      String authorization = getAuthorization(request);
+      if (authorization != null) {
+        JwtToken token = new JwtToken(authorization, request);
+        Authentication authentication = this.authenticationManager.authenticate(token);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+      }
 
-    String authorization = getAuthorization(request);
-    if (authorization != null) {
-      // JwtToken token = new JwtToken(authorization);
-      JwtToken token = new JwtToken(authorization, request);
-      Authentication authentication = this.authenticationManager.authenticate(token);
-      SecurityContextHolder.getContext().setAuthentication(authentication);
+    } catch (AuthenticationException e) {
+      this.authenticationEntryPoint.commence(request, response, e); return;
     }
 
     chain.doFilter(request, response);

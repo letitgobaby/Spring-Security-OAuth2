@@ -58,7 +58,7 @@ public class JWTBuilder {
   }
 
   private Date getExpireTime(int timeProperty) {
-    long expireDate = new Date().getTime() + (timeProperty * 60 * 1000);
+    long expireDate = new Date().getTime() + (timeProperty * 6 * 1000);
     return new Date(expireDate);
   }
 

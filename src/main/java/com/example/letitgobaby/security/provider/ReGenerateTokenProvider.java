@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RefreshProvider implements AuthenticationProvider {
+public class ReGenerateTokenProvider implements AuthenticationProvider {
 
   private final JWTBuilder jwtBuilder;
   private final TokenStoreService tStoreService;
