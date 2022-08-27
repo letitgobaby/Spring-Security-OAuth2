@@ -36,7 +36,7 @@ public class LoginProcessProvider implements AuthenticationProvider {
   
   @Override
   public boolean supports(Class<?> authentication) {
-    return AuthUserToken.class.isAssignableFrom(authentication);
+    return LoginToken.class.isAssignableFrom(authentication);
   }
 
   @Override
@@ -55,14 +55,14 @@ public class LoginProcessProvider implements AuthenticationProvider {
 
     try {
       UserInfo userInfo = new UserInfo().toDto(user);
-      String refreshToken = this.tStoreService.setKeyValue(userInfo);
-
       userInfo.setLoginIp(authToken.getIp());
+
+      String refreshToken = this.tStoreService.setKeyValue(userInfo);
       String accessToken = this.jwtBuilder.accessGenerate(userInfo);
 
-      AuthUserToken auth = new AuthUserToken(user.getUserId(), user.getUserRole());
-      auth.setToken(accessToken, refreshToken);
-      return auth;
+      AuthUserToken authenticated = new AuthUserToken(user.getUserId(), user.getUserRole());
+      authenticated.setToken(accessToken, refreshToken);
+      return authenticated;
     } catch (Exception e) {
       log.error(e.getMessage());
       return null;

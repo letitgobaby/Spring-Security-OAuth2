@@ -29,7 +29,7 @@ public class TokenStore {
   @Column(name = "object_key")
   private String objectKey;
 
-  @Column(name = "object_value")
+  @Column(name = "object_value", length = 99999)
   private String objectValue;
 
 }

@@ -36,6 +36,7 @@ import com.example.letitgobaby.model.UserRepository;
 import com.example.letitgobaby.security.filter.A_LoginFilter;
 import com.example.letitgobaby.security.filter.B_LoginFilter;
 import com.example.letitgobaby.security.filter.JwtVerifyFilter;
+import com.example.letitgobaby.security.filter.RefreshTokenFilter;
 import com.example.letitgobaby.security.filter.dsl.FilterBuilderDsl;
 import com.example.letitgobaby.security.handler.LoginFailureHandler;
 import com.example.letitgobaby.security.handler.LoginSuccessHandler;
@@ -94,6 +95,7 @@ public class SecurityConfig {
 
     http.addFilterBefore(a_LoginFilter(aManager), UsernamePasswordAuthenticationFilter.class);
     http.addFilterBefore(b_LoginFilter(aManager), UsernamePasswordAuthenticationFilter.class);
+    http.addFilterBefore(reGenFilter(aManager), UsernamePasswordAuthenticationFilter.class);
     http.addFilterAt(jwtFilter(aManager), UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
@@ -113,6 +115,15 @@ public class SecurityConfig {
     String LOGIN_URL = "/b/login";
     RequestMatcher login_requestMatcher = new AntPathRequestMatcher(LOGIN_URL, HttpMethod.GET.name());
     B_LoginFilter filter = new B_LoginFilter(login_requestMatcher, authenticationManager);
+    filter.setAuthenticationSuccessHandler(new LoginSuccessHandler());
+    filter.setAuthenticationFailureHandler(new LoginFailureHandler());
+    return filter;
+  }
+
+  public Filter reGenFilter(AuthenticationManager authenticationManager) {
+    String LOGIN_URL = "/regen/accesstoken";
+    RequestMatcher requestMatcher = new AntPathRequestMatcher(LOGIN_URL, HttpMethod.GET.name());
+    RefreshTokenFilter filter = new RefreshTokenFilter(requestMatcher, authenticationManager);
     filter.setAuthenticationSuccessHandler(new LoginSuccessHandler());
     filter.setAuthenticationFailureHandler(new LoginFailureHandler());
     return filter;

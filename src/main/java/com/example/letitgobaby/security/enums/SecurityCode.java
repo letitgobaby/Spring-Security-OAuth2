@@ -6,7 +6,9 @@ public enum SecurityCode {
   BAD_CREDENTIAL("Bad Credential"), 
   
   TOKEN_NOT_FOUND("Token Not Found"), 
-  TOKEN_EXPIRED("Token Expired");
+  TOKEN_EXPIRED("Token Expired"),
+
+  LOGIN_IP_NOT_VALID("Login IP is different");
 
   private final String value;
 
