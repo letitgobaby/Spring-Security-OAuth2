@@ -30,9 +30,9 @@ public class JwtVerifyFilter extends OncePerRequestFilter {
     log.info("## JwtVerifyFilter ##");
 
     String authorization = getAuthorization(request);
-
     if (authorization != null) {
-      JwtToken token = new JwtToken(authorization);
+      // JwtToken token = new JwtToken(authorization);
+      JwtToken token = new JwtToken(authorization, request);
       Authentication authentication = this.authenticationManager.authenticate(token);
       SecurityContextHolder.getContext().setAuthentication(authentication);
     }

@@ -17,6 +17,7 @@ import org.springframework.util.StreamUtils;
 
 import com.example.letitgobaby.security.dto.LoginInfoPayload;
 import com.example.letitgobaby.security.token.AuthUserToken;
+import com.example.letitgobaby.security.token.LoginToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +35,7 @@ public class A_LoginFilter extends AbstractAuthenticationProcessingFilter {
     String requestBody = StreamUtils.copyToString(request.getInputStream(), Charset.forName("UTF-8"));
     LoginInfoPayload paylod = new ObjectMapper().readValue(requestBody, LoginInfoPayload.class);
 
-    AuthUserToken authentication = new AuthUserToken(paylod.getUserId(), paylod.getPswd());
+    LoginToken authentication = new LoginToken(paylod.getUserId(), paylod.getPswd(), request);
     return super.getAuthenticationManager().authenticate(authentication);
   }
 
@@ -43,13 +44,15 @@ public class A_LoginFilter extends AbstractAuthenticationProcessingFilter {
       Authentication authResult) throws IOException, ServletException {
     log.info("# A_LoginFilter - successfulAuthentication # " + authResult.getPrincipal());
     super.getSuccessHandler().onAuthenticationSuccess(request, response, authResult);
+    // super.successfulAuthentication(request, response, chain, authResult);
   }
 
   @Override
   protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
       AuthenticationException failed) throws IOException, ServletException {
     log.info("# A_LoginFilter - unsuccessfulAuthentication #", failed.getMessage());
-    super.unsuccessfulAuthentication(request, response, failed);
+    super.getFailureHandler().onAuthenticationFailure(request, response, failed);
+    // super.unsuccessfulAuthentication(request, response, failed);
   }
   
 }

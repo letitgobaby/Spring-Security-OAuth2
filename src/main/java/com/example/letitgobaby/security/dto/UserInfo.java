@@ -18,6 +18,7 @@ public class UserInfo implements Serializable {
   private String userId;
   private String userName;
   private String userRole;
+  private String loginIp;
 
   public UserInfo toDto(User user) {
     return UserInfo.builder()

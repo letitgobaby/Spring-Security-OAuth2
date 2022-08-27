@@ -18,6 +18,7 @@ import com.example.letitgobaby.model.UserRepository;
 import com.example.letitgobaby.security.dto.UserInfo;
 import com.example.letitgobaby.security.enums.SecurityCode;
 import com.example.letitgobaby.security.token.AuthUserToken;
+import com.example.letitgobaby.security.token.LoginToken;
 import com.example.letitgobaby.utils.JWTBuilder;
 
 import lombok.RequiredArgsConstructor;
@@ -34,10 +35,16 @@ public class LoginProcessProvider implements AuthenticationProvider {
   private final PasswordEncoder encoder;
   
   @Override
+  public boolean supports(Class<?> authentication) {
+    return AuthUserToken.class.isAssignableFrom(authentication);
+  }
+
+  @Override
   public Authentication authenticate(Authentication authentication) throws AuthenticationException {
     log.info("## do LoginProcessProvider ##");
-    String userId = (String) authentication.getPrincipal();
-    String pswd = (String) authentication.getCredentials();
+    LoginToken authToken = (LoginToken) authentication;
+    String userId = authToken.getPrincipal();
+    String pswd = authToken.getCredentials();
 
     User user = this.userRepository.findByUserId(userId)
       .orElseThrow(() -> new UsernameNotFoundException(SecurityCode.USER_NOT_FOUND.getValue()));
@@ -48,8 +55,10 @@ public class LoginProcessProvider implements AuthenticationProvider {
 
     try {
       UserInfo userInfo = new UserInfo().toDto(user);
-      String accessToken = this.jwtBuilder.accessGenerate(userInfo);
       String refreshToken = this.tStoreService.setKeyValue(userInfo);
+
+      userInfo.setLoginIp(authToken.getIp());
+      String accessToken = this.jwtBuilder.accessGenerate(userInfo);
 
       AuthUserToken auth = new AuthUserToken(user.getUserId(), user.getUserRole());
       auth.setToken(accessToken, refreshToken);
@@ -58,11 +67,6 @@ public class LoginProcessProvider implements AuthenticationProvider {
       log.error(e.getMessage());
       return null;
     }
-  }
-
-  @Override
-  public boolean supports(Class<?> authentication) {
-    return AuthUserToken.class.isAssignableFrom(authentication);
   }
   
 }

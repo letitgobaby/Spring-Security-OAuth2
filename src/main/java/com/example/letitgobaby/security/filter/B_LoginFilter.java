@@ -16,6 +16,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import com.example.letitgobaby.security.token.AuthUserToken;
+import com.example.letitgobaby.security.token.LoginToken;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,11 +29,12 @@ public class B_LoginFilter extends AbstractAuthenticationProcessingFilter {
   }
 
   @Override
-  public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
+  public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) 
+      throws AuthenticationException, IOException, ServletException {
     String id = request.getParameter("id");
     String pw = request.getParameter("pw");
 
-    AuthUserToken authentication = new AuthUserToken(id, pw);
+    LoginToken authentication = new LoginToken(id, pw, request);
     return super.getAuthenticationManager().authenticate(authentication);
   }
 
@@ -45,13 +47,15 @@ public class B_LoginFilter extends AbstractAuthenticationProcessingFilter {
       Authentication authResult) throws IOException, ServletException {
     log.info("# B_LoginFilter - successfulAuthentication # " + authResult.getPrincipal());
     super.getSuccessHandler().onAuthenticationSuccess(request, response, authResult);
+    // super.successfulAuthentication(request, response, chain, authResult);
   }
 
   @Override
   public void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
       AuthenticationException failed) throws IOException, ServletException {
     log.info("# B_LoginFilter - unsuccessfulAuthentication #", failed.getMessage());
-    super.unsuccessfulAuthentication(request, response, failed);
+    super.getFailureHandler().onAuthenticationFailure(request, response, failed);
+    // super.unsuccessfulAuthentication(request, response, failed);
   }
   
 }

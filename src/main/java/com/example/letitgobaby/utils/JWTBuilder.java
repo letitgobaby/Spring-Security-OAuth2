@@ -45,6 +45,8 @@ public class JWTBuilder {
   }
 
   public Boolean validate(String token) throws Exception {
+    if (token == null) return null;
+    
     DecodedJWT jwt = this.verifier.verify(token);
     String issuer = jwt.getIssuer();
     return issuer != null ? true : false;

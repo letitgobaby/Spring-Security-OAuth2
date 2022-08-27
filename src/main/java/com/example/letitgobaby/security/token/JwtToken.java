@@ -2,12 +2,15 @@ package com.example.letitgobaby.security.token;
 
 import java.util.Collection;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 
 public class JwtToken extends AbstractAuthenticationToken {
 
   private String jwtToken;
+  private HttpServletRequest request;
 
   public JwtToken(String token) {
     super(null);
@@ -15,21 +18,31 @@ public class JwtToken extends AbstractAuthenticationToken {
     this.jwtToken = token;
   }
 
+  public JwtToken(String token, HttpServletRequest request) {
+    super(null);
+    super.setAuthenticated(false);
+    this.jwtToken = token;
+    this.request = request;
+  }
+
   public JwtToken(Collection<? extends GrantedAuthority> authorities) {
     super(authorities);
-    //TODO Auto-generated constructor stub
+  }
+
+  @Override
+  public String getPrincipal() {
+    return this.jwtToken;
   }
 
   @Override
   public Object getCredentials() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Object getPrincipal() {
-    // TODO Auto-generated method stub
     return null;
   }
   
+  public String getIp() {
+    return (null != request.getHeader("X-FORWARDED-FOR")) 
+      ? request.getHeader("X-FORWARDED-FOR") 
+      : request.getRemoteAddr();
+  }
+
 }
