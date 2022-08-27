@@ -27,7 +27,7 @@ public class UserAuthService {
       .userId("123")
       .userName("123")
       .password(this.encoder.encode("123"))
-      .userRole("123")
+      .userRole("USER")
       .build();
   
       this.userRepository.save(entity);

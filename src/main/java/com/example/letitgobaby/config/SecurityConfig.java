@@ -74,15 +74,16 @@ public class SecurityConfig {
       .authorizeHttpRequests(authorize -> {
         authorize
           .antMatchers(PERMIT_URL).permitAll()
+          .antMatchers("/user/auth/test").hasAnyRole("USER")
           .anyRequest().authenticated();
       })
       .exceptionHandling()
       .authenticationEntryPoint((req, res, ex) -> {
-        log.error(ex.getMessage());
+        log.error("authenticationEntryPoint " + ex.getClass().getName() + " = " + ex.getMessage());
         res.sendError(HttpServletResponse.SC_FORBIDDEN, ex.getMessage());
       })
       .accessDeniedHandler((req, res, ex) -> {
-        log.error(ex.getMessage());
+        log.error("accessDeniedHandler - " + ex.getClass().getName() + " = " + ex.getMessage());
         res.sendError(HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage());
       });
 
