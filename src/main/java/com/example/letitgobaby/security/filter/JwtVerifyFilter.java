@@ -9,12 +9,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.example.letitgobaby.security.exception.LoginAuthenticationException;
+import com.example.letitgobaby.security.exception.JwtAuthenticationException;
 import com.example.letitgobaby.security.token.JwtToken;
 
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +43,7 @@ public class JwtVerifyFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authentication);
       }
 
-    } catch (AuthenticationException e) {
+    } catch (JwtAuthenticationException e) {
       this.authenticationEntryPoint.commence(request, response, e); return;
     }
 
