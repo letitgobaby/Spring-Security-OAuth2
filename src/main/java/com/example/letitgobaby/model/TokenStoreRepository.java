@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TokenStoreRepository extends JpaRepository<TokenStore, Long> {
   
+  Optional<TokenStore> findByObjectKey(String objectKey);
   Optional<TokenStore> findByUserId(String userId);
 
 }

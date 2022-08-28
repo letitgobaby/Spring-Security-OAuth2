@@ -1,10 +1,14 @@
 package com.example.letitgobaby.security.provider;
 
+import java.util.Calendar;
+import java.util.Date;
+
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.letitgobaby.app.tokenStore.TokenStoreService;
 import com.example.letitgobaby.security.dto.UserInfo;
 import com.example.letitgobaby.security.enums.SecurityCode;
@@ -33,23 +37,29 @@ public class ReGenerateTokenProvider implements AuthenticationProvider {
   @Override
   public Authentication authenticate(Authentication authentication) throws AuthenticationException {
     try {
-      RefreshAuthToken auth = (RefreshAuthToken) authentication;
-      String refreshToken = auth.getPrincipal();
+      RefreshAuthToken payload = (RefreshAuthToken) authentication;
+      String refreshToken = this.tStoreService.getToken(payload.getPrincipal());
+      if (refreshToken == null) {
+        throw new JwtAuthenticationException(SecurityCode.TOKEN_NOT_FOUND.getValue());
+      }
+
       if (this.jwtBuilder.validate(refreshToken)) {
-        UserInfo userInfo = this.jwtBuilder.getClaim(refreshToken, "userInfo").as(UserInfo.class);
+        DecodedJWT decodedJwt = this.jwtBuilder.decode(refreshToken);
+        UserInfo userInfo = decodedJwt.getClaim("userInfo").as(UserInfo.class);
   
         // 로그인 한 곳과 같은 IP만 인증처리
-        if (!userInfo.getLoginIp().equals(auth.getIp())) {
+        if (!userInfo.getLoginIp().equals(payload.getIp())) {
           throw new LoginAuthenticationException(SecurityCode.LOGIN_IP_NOT_VALID.getValue());
         }
-
-        // "만료시간 체크"
-        if (false) {
+        
+        if (isWarningExpiredTime(decodedJwt.getExpiresAt())) {
           refreshToken = this.tStoreService.setKeyValue(userInfo);
+        } else {
+          refreshToken = payload.getPrincipal();
         }
 
         String accessToken = this.jwtBuilder.accessGenerate(userInfo);
-  
+
         AuthUserToken authenticated = new AuthUserToken(userInfo.getUserId(), userInfo.getUserRole());
         authenticated.setToken(accessToken, refreshToken);
         return authenticated;
@@ -60,6 +70,13 @@ public class ReGenerateTokenProvider implements AuthenticationProvider {
       log.error(e.getMessage());
       throw new JwtAuthenticationException(e.getMessage());
     }
+  }
+
+  private boolean isWarningExpiredTime(Date tokenTime) {
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(tokenTime);
+    cal.add(Calendar.DATE, -1);
+    return new Date().after(cal.getTime()) ? true : false;
   }
   
 }

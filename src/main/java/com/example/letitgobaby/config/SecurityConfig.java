@@ -39,7 +39,8 @@ import lombok.extern.slf4j.Slf4j;
 public class SecurityConfig {
   
   private final String[] RESOURCE_URL = new String[] { "/static/**", "/favicon.ico", "/js/**", "/images/**", "/css/**", "/fonts/**" };
-  private final String[] PERMIT_URL = new String[] { "/", "/login", "/a/login", "/b/login", "/fail", "/test", "/h2", "/h2/**", "/user/test" };
+  private final String[] AUTHENTICATE_PERMIT_URL = new String[] { "/a/login", "/b/login", "/refresh/token" };
+  private final String[] PERMIT_URL = new String[] { "/", "/fail", "/test", "/h2", "/h2/**", "/user/test" };
 
   private final LoginProcessProvider loginProvider;
   private final JwtVerifyProvider jwtProvider;
@@ -62,6 +63,7 @@ public class SecurityConfig {
       .sessionManagement(sseion -> sseion.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
       .authorizeHttpRequests(authorize -> {
         authorize
+          .antMatchers(AUTHENTICATE_PERMIT_URL).permitAll()
           .antMatchers(PERMIT_URL).permitAll()
           .antMatchers("/user/auth/test").hasAnyRole("USER")
           .anyRequest().authenticated();
@@ -109,7 +111,7 @@ public class SecurityConfig {
   }
 
   public Filter reGenFilter(AuthenticationManager authenticationManager) {
-    String LOGIN_URL = "/regen/accesstoken";
+    String LOGIN_URL = "/refresh/token";
     RequestMatcher requestMatcher = new AntPathRequestMatcher(LOGIN_URL, HttpMethod.GET.name());
     RefreshTokenFilter filter = new RefreshTokenFilter(requestMatcher, authenticationManager);
     filter.setAuthenticationSuccessHandler(new LoginSuccessHandler());

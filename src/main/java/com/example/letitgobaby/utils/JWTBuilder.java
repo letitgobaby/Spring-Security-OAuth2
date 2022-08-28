@@ -32,7 +32,7 @@ public class JWTBuilder {
     return JWT.create()
       .withIssuer(this.issuer)
       .withClaim("userInfo", new ObjectMapper().convertValue(obj, Map.class))
-      .withExpiresAt(getExpireTime(this.accessTime))
+      .withExpiresAt(setExpireTime(this.accessTime))
       .sign(this.algorithm);
   }
 
@@ -40,7 +40,7 @@ public class JWTBuilder {
     return JWT.create()
       .withIssuer(this.issuer)
       .withClaim("userInfo", new ObjectMapper().convertValue(obj, Map.class))
-      .withExpiresAt(getExpireTime(this.refreshTime))
+      .withExpiresAt(setExpireTime(this.refreshTime))
       .sign(this.algorithm);
   }
 
@@ -52,13 +52,21 @@ public class JWTBuilder {
     return issuer != null ? true : false;
   }
 
+  public DecodedJWT decode(String token) {
+    return JWT.decode(token);
+  }
+
   public Claim getClaim(String token, String claimKey) {
     DecodedJWT decodedJWT = JWT.decode(token);
     return decodedJWT.getClaims().get(claimKey);
   }
 
-  private Date getExpireTime(int timeProperty) {
-    long expireDate = new Date().getTime() + (timeProperty * 6 * 1000);
+  public void getExpiredTime() {
+
+  }
+
+  private Date setExpireTime(int timeProperty) {
+    long expireDate = new Date().getTime() + (timeProperty * 60 * 1000);
     return new Date(expireDate);
   }
 

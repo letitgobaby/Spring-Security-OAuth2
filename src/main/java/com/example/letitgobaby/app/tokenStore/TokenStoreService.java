@@ -22,6 +22,15 @@ public class TokenStoreService {
   private final JWTBuilder jwtBuilder;
 
   @Transactional
+  public String getToken(String key) {
+    Optional<TokenStore> tStore = this.tStoreRepository.findByObjectKey(key);
+    if (tStore.isPresent()) {
+      return tStore.get().getObjectValue();
+    }
+    return null;
+  }
+
+  @Transactional
   public String setKeyValue(UserInfo userInfo) throws Exception {
     String refreshToken = this.jwtBuilder.refreshGenerate(userInfo);
 
