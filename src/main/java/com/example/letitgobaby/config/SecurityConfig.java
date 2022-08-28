@@ -39,8 +39,8 @@ import lombok.extern.slf4j.Slf4j;
 public class SecurityConfig {
   
   private final String[] RESOURCE_URL = new String[] { "/static/**", "/favicon.ico", "/js/**", "/images/**", "/css/**", "/fonts/**" };
-  private final String[] AUTHENTICATE_PERMIT_URL = new String[] { "/a/login", "/b/login", "/refresh/token" };
-  private final String[] PERMIT_URL = new String[] { "/", "/fail", "/test", "/h2", "/h2/**", "/user/test" };
+  private final String[] AUTHENTICATE_PERMIT_URL = new String[] { "/main/login", "/user/signUp", "/refresh/token" };
+  private final String[] PERMIT_URL = new String[] { "/login", "/fail", "/test", "/h2", "/h2/**", "/user/test" };
 
   private final LoginProcessProvider loginProvider;
   private final JwtVerifyProvider jwtProvider;
@@ -71,7 +71,7 @@ public class SecurityConfig {
       .exceptionHandling()
       .authenticationEntryPoint((req, res, ex) -> {
         log.error("authenticationEntryPoint " + ex.getClass().getName() + " = " + ex.getMessage());
-        res.sendError(HttpServletResponse.SC_FORBIDDEN, ex.getMessage());
+        res.sendRedirect("/login");
       })
       .accessDeniedHandler((req, res, ex) -> {
         log.error("accessDeniedHandler - " + ex.getClass().getName() + " = " + ex.getMessage());
@@ -84,7 +84,7 @@ public class SecurityConfig {
     http.authenticationManager(aManager);
 
     http.addFilterBefore(a_LoginFilter(aManager), UsernamePasswordAuthenticationFilter.class);
-    http.addFilterBefore(b_LoginFilter(aManager), UsernamePasswordAuthenticationFilter.class);
+    // http.addFilterBefore(b_LoginFilter(aManager), UsernamePasswordAuthenticationFilter.class);
     http.addFilterBefore(reGenFilter(aManager), UsernamePasswordAuthenticationFilter.class);
     http.addFilterAt(jwtFilter(aManager), UsernamePasswordAuthenticationFilter.class);
 
@@ -93,7 +93,7 @@ public class SecurityConfig {
 
 
   public Filter a_LoginFilter(AuthenticationManager authenticationManager) {
-    String LOGIN_URL = "/a/login";
+    String LOGIN_URL = "/main/login";
     RequestMatcher login_requestMatcher = new AntPathRequestMatcher(LOGIN_URL, HttpMethod.POST.name());
     A_LoginFilter filter = new A_LoginFilter(login_requestMatcher, authenticationManager);
     filter.setAuthenticationSuccessHandler(new LoginSuccessHandler());
@@ -101,14 +101,14 @@ public class SecurityConfig {
     return filter;
   }
 
-  public Filter b_LoginFilter(AuthenticationManager authenticationManager) {
-    String LOGIN_URL = "/b/login";
-    RequestMatcher login_requestMatcher = new AntPathRequestMatcher(LOGIN_URL, HttpMethod.GET.name());
-    B_LoginFilter filter = new B_LoginFilter(login_requestMatcher, authenticationManager);
-    filter.setAuthenticationSuccessHandler(new LoginSuccessHandler());
-    filter.setAuthenticationFailureHandler(new LoginFailureHandler());
-    return filter;
-  }
+  // public Filter b_LoginFilter(AuthenticationManager authenticationManager) {
+  //   String LOGIN_URL = "/b/login";
+  //   RequestMatcher login_requestMatcher = new AntPathRequestMatcher(LOGIN_URL, HttpMethod.GET.name());
+  //   B_LoginFilter filter = new B_LoginFilter(login_requestMatcher, authenticationManager);
+  //   filter.setAuthenticationSuccessHandler(new LoginSuccessHandler());
+  //   filter.setAuthenticationFailureHandler(new LoginFailureHandler());
+  //   return filter;
+  // }
 
   public Filter reGenFilter(AuthenticationManager authenticationManager) {
     String LOGIN_URL = "/refresh/token";

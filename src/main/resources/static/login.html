@@ -5,11 +5,24 @@
   <link rel="stylesheet" href="/css/login.css">
   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script type="text/javascript" src="/js/request.js"></script>
   <title>Main Login</title>
 </head>
 
 <body>
   <div id="app" class="tabbed">
+
+    <div v-if="isLogin">
+      <div @click.prevent="getInfo()" style="cursor: pointer;">
+        <h3>DO CLICK @ ( /user/info )</h3>
+      </div>
+      
+      <br/><br/><br/>
+    </div>
+
+    <h1>{{ isLogin ? 'login!!' : 'hello' }}</h1>
+
+
     <input type="radio" name="tabs" id="tab-nav-1" checked>
     <label for="tab-nav-1">Log in</label>
 
@@ -17,16 +30,15 @@
     <label for="tab-nav-2">Sign Up</label>
 
     <input type="radio" name="tabs" id="tab-nav-4">
+
     <div class="tabs">
-
-
       <div>
         <h2>Log in</h2>
-        <input type="text" v-model="loginId" class="inputItem" placeholder="Username">
+        <input type="text" v-model="userId" class="inputItem" placeholder="Username">
         <p></p>
         <input type="password" v-model="pswd" class="inputItem" placeholder="Password">
         <p></p>
-        <input type="button" class="buttonItem" value="Log in" @click.prevent="test()">
+        <input type="button" class="buttonItem" value="Log in" @click.prevent="login()">
       </div>
 
 
@@ -38,9 +50,9 @@
         <p></p>
         <input type="button" class="buttonItem" value="Sign up" @click.prevent="signUp()">
       </div>
-
-
     </div>
+    
+
   </div>
 
 
@@ -52,45 +64,55 @@
         pswd: '',
 
         signUpId: '',
-        signUpPw: ''
+        signUpPw: '',
+
+
+        isLogin: false,
+
+        requestHeader: { "Authorization": "" }
       },
       methods: {
+
         login() {
           const body = {
             userId: this.userId,
             pswd: this.pswd
           }
 
-          this.request('POST', '/user/signUp', body)
-            .then(res => alert(res.message))
+          post('/main/login', body)
+            .then(res => {
+              alert(res.message);
+              console.log(res);
+              if (res.status === 200) {
+                app.isLogin = true;
+              }
+              if (res.data.tokenType === 'Bearer') {
+                document.cookie = "R_TOKEN=" + res.data.refreshToken;
+                tokenStore.access_token = res.data.accessToken;
+              }
+            })
             .catch(err => console.log(err));
         },
+
         signUp() {
           const body = {
             userId: this.signUpId,
             password: this.signUpPw
           }
 
-          this.request('POST', '/user/signUp', body)
+          post('/user/signUp', body)
             .then(res => alert(res.message))
             .catch(err => console.log(err));
         },
 
 
-        request(type, url, data) {
-          return new Promise((resolve, reject) => {
-            axios({
-              method: type,
-              url: url,
-              baseURL: document.location.origin,
-              data: data,
-              responseType: 'json',
-              responseEncoding: 'utf8',
-              headers: {'X-Requested-With': 'XMLHttpRequest'},
+        getInfo() {
+          get('/user/info')
+            .then(res => {
+              alert("User ID is = " + res.data);
+              console.log(res);
             })
-            .then(res => resolve(res.data))
-            .catch(err => reject(err.response.data));
-          });
+            .catch(err => console.log(err));
         }
 
       }
