@@ -57,7 +57,7 @@ public class LoginProcessProvider implements AuthenticationProvider {
       UserInfo userInfo = new UserInfo().toDto(user);
       userInfo.setLoginIp(authToken.getIp());
 
-      String refreshToken = this.tStoreService.setKeyValue(userInfo);
+      String refreshToken = this.tStoreService.setToken(userInfo);
       String accessToken = this.jwtBuilder.accessGenerate(userInfo);
 
       AuthUserToken authenticated = new AuthUserToken(user.getUserId(), user.getUserRole());

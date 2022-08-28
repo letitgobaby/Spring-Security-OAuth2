@@ -31,7 +31,7 @@ public class TokenStoreService {
   }
 
   @Transactional
-  public String setKeyValue(UserInfo userInfo) throws Exception {
+  public String setToken(UserInfo userInfo) throws Exception {
     String refreshToken = this.jwtBuilder.refreshGenerate(userInfo);
 
     TokenStore entity = null;

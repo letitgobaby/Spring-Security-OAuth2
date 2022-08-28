@@ -44,7 +44,6 @@ public class A_LoginFilter extends AbstractAuthenticationProcessingFilter {
       Authentication authResult) throws IOException, ServletException {
     log.info("# A_LoginFilter - successfulAuthentication # " + authResult.getPrincipal());
     super.getSuccessHandler().onAuthenticationSuccess(request, response, authResult);
-    // super.successfulAuthentication(request, response, chain, authResult);
   }
 
   @Override
@@ -52,7 +51,6 @@ public class A_LoginFilter extends AbstractAuthenticationProcessingFilter {
       AuthenticationException failed) throws IOException, ServletException {
     log.info("# A_LoginFilter - unsuccessfulAuthentication #", failed.getMessage());
     super.getFailureHandler().onAuthenticationFailure(request, response, failed);
-    // super.unsuccessfulAuthentication(request, response, failed);
   }
   
 }

@@ -53,7 +53,7 @@ public class ReGenerateTokenProvider implements AuthenticationProvider {
         }
         
         if (isWarningExpiredTime(decodedJwt.getExpiresAt())) {
-          refreshToken = this.tStoreService.setKeyValue(userInfo);
+          refreshToken = this.tStoreService.setToken(userInfo);
         } else {
           refreshToken = payload.getPrincipal();
         }
