@@ -1,0 +1,140 @@
+@import "compass/css3";
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+    overflow-y: scroll;
+}
+
+body {
+  background: #000;
+  color: #eee;
+  font-family: helvetica, arial, sans-serif;
+}
+
+::selection {
+  background-color: #4EC6DE;
+}
+
+.tabbed {
+  width: 700px;
+  margin: 30px auto;
+}
+
+.tabbed > input {
+  display: none;
+}
+
+.tabbed > label {
+  display: block;
+  float: left;
+  padding: 12px 20px;
+  margin-right: 5px;
+  cursor: pointer;
+  border: 2px solid #333;
+  border-radius: 3px 3px 0px 0px;
+  font-size: 1.4em;
+}
+
+.tabbed > label:hover,
+.tabbed > input:checked + label {
+  background: #4EC6DE;
+  color: black;
+  font-size: 1.4em;
+  border: 2px solid #4EC6DE;
+}
+
+.tabs {
+  clear: both;
+  perspective: 600px;
+}
+
+.tabs > div {
+  width: 700px;
+  position: absolute;
+  border: 2px solid #4EC6DE;
+  padding: 10px 30px 40px;
+  line-height: 1.4em;
+  opacity: 0;
+  z-index: 0;
+}
+
+#tab-nav-1:checked ~ .tabs > div:nth-of-type(1),
+#tab-nav-2:checked ~ .tabs > div:nth-of-type(2),
+#tab-nav-3:checked ~ .tabs > div:nth-of-type(3)
+{
+  transform: rotateX(0);
+  opacity: 1;
+  z-index: 1;
+}
+
+.inputItem {
+  background-color: #fff;
+  border: 2px solid #4EC6DE;
+  font-size: 1.4em;
+  height: 2em;
+  padding-left: 0.4em;
+  width: 100%;
+}
+
+input[type="text"], 
+input[type="password"], 
+input[type="email"], 
+textarea {
+  color: #fff;
+  background-color : #000; 
+}
+
+input[type="text"]:hover, 
+input[type="password"]:hover, 
+input[type="email"]:hover, 
+textarea:hover {
+  color: #000;
+  background-color : #4EC6DE; 
+}
+
+.buttonItem {
+  background-color: #000;
+  border: 2px solid #4EC6DE;
+  color: #fff;
+  font-size: 1.4em;
+  height: 2em;
+  min-width: 6em;
+}
+.buttonItem:hover {
+  background-color: #4EC6DE;
+  color: black;
+}
+.avatar-wrapper {
+  justify-content: center;
+  display: flex;
+  align-items: center;
+}
+.avatar {
+  border-radius: 50%;
+  content: url(http://s01.riotpixels.net/data/26/18/2618df78-a6ec-4045-90aa-0c27aedc4c3f.png.240p.jpg);
+  padding: 1em;
+  margin-bottom: 1em;
+  max-width: 30%;
+  max-height: 30%;
+}
+
+@media screen and (max-width: 700px) {
+  .tabbed { width: 340px }
+  .tabbed > label { display: none }
+  .tabs > div {
+    width: 340px;
+    border: none;
+    padding: 0;
+    opacity: 1;
+    position: relative;
+    transform: none;
+    margin-bottom: 60px;
+  }
+  .tabs > div h2 {
+    border-bottom: 2px solid #4EC6DE;
+    padding-bottom: .5em;
+  }
+}

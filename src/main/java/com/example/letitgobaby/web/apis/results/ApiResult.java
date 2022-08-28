@@ -1,4 +1,4 @@
-package com.example.letitgobaby.apis.results;
+package com.example.letitgobaby.web.apis.results;
 
 import lombok.Getter;
 

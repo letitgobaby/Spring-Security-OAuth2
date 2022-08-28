@@ -1,0 +1,100 @@
+<html>
+<head>
+  <meta charset=utf-8>
+  <meta name="description" content="CSS Tabs" />
+  <link rel="stylesheet" href="/css/login.css">
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <title>Main Login</title>
+</head>
+
+<body>
+  <div id="app" class="tabbed">
+    <input type="radio" name="tabs" id="tab-nav-1" checked>
+    <label for="tab-nav-1">Log in</label>
+
+    <input type="radio" name="tabs" id="tab-nav-2">
+    <label for="tab-nav-2">Sign Up</label>
+
+    <input type="radio" name="tabs" id="tab-nav-4">
+    <div class="tabs">
+
+
+      <div>
+        <h2>Log in</h2>
+        <input type="text" v-model="loginId" class="inputItem" placeholder="Username">
+        <p></p>
+        <input type="password" v-model="pswd" class="inputItem" placeholder="Password">
+        <p></p>
+        <input type="button" class="buttonItem" value="Log in" @click.prevent="test()">
+      </div>
+
+
+      <div>
+        <h2>Sign up</h2>
+        <input type="text" v-model="signUpId" class="inputItem" placeholder="Username">
+        <p></p>
+        <input type="password" v-model="signUpPw" class="inputItem" placeholder="Password">
+        <p></p>
+        <input type="button" class="buttonItem" value="Sign up" @click.prevent="signUp()">
+      </div>
+
+
+    </div>
+  </div>
+
+
+  <script>
+    const app = new Vue({
+      el: '#app',
+      data: {
+        userId: '',
+        pswd: '',
+
+        signUpId: '',
+        signUpPw: ''
+      },
+      methods: {
+        login() {
+          const body = {
+            userId: this.userId,
+            pswd: this.pswd
+          }
+
+          this.request('POST', '/user/signUp', body)
+            .then(res => alert(res.message))
+            .catch(err => console.log(err));
+        },
+        signUp() {
+          const body = {
+            userId: this.signUpId,
+            password: this.signUpPw
+          }
+
+          this.request('POST', '/user/signUp', body)
+            .then(res => alert(res.message))
+            .catch(err => console.log(err));
+        },
+
+
+        request(type, url, data) {
+          return new Promise((resolve, reject) => {
+            axios({
+              method: type,
+              url: url,
+              baseURL: document.location.origin,
+              data: data,
+              responseType: 'json',
+              responseEncoding: 'utf8',
+              headers: {'X-Requested-With': 'XMLHttpRequest'},
+            })
+            .then(res => resolve(res.data))
+            .catch(err => reject(err.response.data));
+          });
+        }
+
+      }
+    })
+  </script>
+</body>
+</html>
