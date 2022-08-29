@@ -1,7 +1,6 @@
 package com.example.letitgobaby.security.filter;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -11,46 +10,52 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.springframework.util.StreamUtils;
 
-import com.example.letitgobaby.security.dto.LoginInfoPayload;
 import com.example.letitgobaby.security.token.AuthUserToken;
 import com.example.letitgobaby.security.token.LoginToken;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
-public class A_LoginFilter extends AbstractAuthenticationProcessingFilter {
 
-  public A_LoginFilter(RequestMatcher requestMatcher, AuthenticationManager authenticationManager) {
+@Slf4j
+public class SubLoginFilter extends AbstractAuthenticationProcessingFilter {
+
+  public SubLoginFilter(RequestMatcher requestMatcher, AuthenticationManager authenticationManager) {
     super(requestMatcher, authenticationManager);
   }
 
   @Override
-  public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
+  public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) 
       throws AuthenticationException, IOException, ServletException {
-    String requestBody = StreamUtils.copyToString(request.getInputStream(), Charset.forName("UTF-8"));
-    LoginInfoPayload paylod = new ObjectMapper().readValue(requestBody, LoginInfoPayload.class);
+    String id = request.getParameter("id");
+    String pw = request.getParameter("pw");
 
-    LoginToken authentication = new LoginToken(paylod.getUserId(), paylod.getPswd(), request);
+    LoginToken authentication = new LoginToken(id, pw, request);
     return super.getAuthenticationManager().authenticate(authentication);
   }
 
-  @Override
-  protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
-      Authentication authResult) throws IOException, ServletException {
-    log.info("# A_LoginFilter - successfulAuthentication # " + authResult.getPrincipal());
-    super.getSuccessHandler().onAuthenticationSuccess(request, response, authResult);
+  public void setSuccessHandler(AuthenticationSuccessHandler successHandler) {
+    super.setAuthenticationSuccessHandler(successHandler);
   }
 
   @Override
-  protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
+  public void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
+      Authentication authResult) throws IOException, ServletException {
+    log.info("# B_LoginFilter - successfulAuthentication # " + authResult.getPrincipal());
+    super.getSuccessHandler().onAuthenticationSuccess(request, response, authResult);
+    // super.successfulAuthentication(request, response, chain, authResult);
+  }
+
+  @Override
+  public void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
       AuthenticationException failed) throws IOException, ServletException {
-    log.info("# A_LoginFilter - unsuccessfulAuthentication #", failed.getMessage());
+    log.info("# B_LoginFilter - unsuccessfulAuthentication #", failed.getMessage());
     super.getFailureHandler().onAuthenticationFailure(request, response, failed);
+    // super.unsuccessfulAuthentication(request, response, failed);
   }
   
 }
