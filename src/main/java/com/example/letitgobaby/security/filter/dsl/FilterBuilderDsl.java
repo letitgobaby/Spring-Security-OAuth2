@@ -11,7 +11,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import com.example.letitgobaby.security.filter.MainLoginFilter;
-import com.example.letitgobaby.security.filter.SubLoginFilter;
+import com.example.letitgobaby.security.filter.sub.SubLoginFilter;
 import com.example.letitgobaby.security.filter.JwtVerifyFilter;
 import com.example.letitgobaby.security.handler.LoginFailureHandler;
 import com.example.letitgobaby.security.handler.LoginSuccessHandler;

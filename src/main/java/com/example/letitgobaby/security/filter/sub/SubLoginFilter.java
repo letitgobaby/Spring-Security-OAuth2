@@ -1,4 +1,4 @@
-package com.example.letitgobaby.security.filter;
+package com.example.letitgobaby.security.filter.sub;
 
 import java.io.IOException;
 
@@ -47,7 +47,6 @@ public class SubLoginFilter extends AbstractAuthenticationProcessingFilter {
       Authentication authResult) throws IOException, ServletException {
     log.info("# B_LoginFilter - successfulAuthentication # " + authResult.getPrincipal());
     super.getSuccessHandler().onAuthenticationSuccess(request, response, authResult);
-    // super.successfulAuthentication(request, response, chain, authResult);
   }
 
   @Override
@@ -55,7 +54,6 @@ public class SubLoginFilter extends AbstractAuthenticationProcessingFilter {
       AuthenticationException failed) throws IOException, ServletException {
     log.info("# B_LoginFilter - unsuccessfulAuthentication #", failed.getMessage());
     super.getFailureHandler().onAuthenticationFailure(request, response, failed);
-    // super.unsuccessfulAuthentication(request, response, failed);
   }
   
 }

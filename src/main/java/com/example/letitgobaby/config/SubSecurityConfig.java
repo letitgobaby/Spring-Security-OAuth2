@@ -3,16 +3,15 @@ package com.example.letitgobaby.config;
 import java.util.Arrays;
 
 import javax.servlet.Filter;
-import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -21,10 +20,9 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
-import com.example.letitgobaby.security.filter.SubJwtVerifyFilter;
-import com.example.letitgobaby.security.filter.SubLoginFilter;
+import com.example.letitgobaby.security.filter.sub.SubJwtVerifyFilter;
+import com.example.letitgobaby.security.filter.sub.SubLoginFilter;
 import com.example.letitgobaby.security.handler.LoginFailureHandler;
 import com.example.letitgobaby.security.handler.LoginSuccessHandler;
 import com.example.letitgobaby.security.provider.LoginProcessProvider;
@@ -47,10 +45,21 @@ public class SubSecurityConfig {
     http.csrf().disable();
     http.headers().frameOptions().disable();
     http.cors().configurationSource(corsConfigurationSource());
+    http.sessionManagement(sseion -> sseion.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
     http.antMatcher("/sub/**");
     http.authorizeHttpRequests(authorize -> {
       authorize.anyRequest().permitAll();
+    });
+
+
+    http.exceptionHandling((handle) -> {
+      handle.accessDeniedHandler((req, res, ex) -> {
+        res.sendError(HttpStatus.FORBIDDEN.value(), ex.getMessage());
+      });
+      handle.authenticationEntryPoint((req, res, ex) -> {
+        res.sendError(HttpStatus.UNAUTHORIZED.value(), ex.getMessage());
+      });
     });
 
     AuthenticationManagerBuilder authManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
@@ -72,15 +81,14 @@ public class SubSecurityConfig {
     return filter;
   }
 
-  @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();  
-    CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowCredentials(true);
-    configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080"));
-    configuration.setAllowedMethods(Arrays.asList("OPTIONS", "GET", "POST"));
-    configuration.addAllowedHeader("*");
-    source.registerCorsConfiguration("/**", configuration);
+    CorsConfiguration config = new CorsConfiguration();
+    config.setAllowCredentials(true);
+    config.setAllowedOriginPatterns(Arrays.asList("*"));
+    config.setAllowedMethods(Arrays.asList("OPTIONS", "GET"));
+    config.addAllowedHeader("Authorization");
+    source.registerCorsConfiguration("/**", config);
     return source;
   }
 

@@ -16,7 +16,6 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.StreamUtils;
 
 import com.example.letitgobaby.security.dto.LoginInfoPayload;
-import com.example.letitgobaby.security.token.AuthUserToken;
 import com.example.letitgobaby.security.token.LoginToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
