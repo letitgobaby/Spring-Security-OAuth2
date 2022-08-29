@@ -21,6 +21,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.example.letitgobaby.security.filter.sub.SubAuthorizeFilter;
 import com.example.letitgobaby.security.filter.sub.SubJwtVerifyFilter;
 import com.example.letitgobaby.security.filter.sub.SubLoginFilter;
 import com.example.letitgobaby.security.handler.LoginFailureHandler;
@@ -70,6 +71,15 @@ public class SubSecurityConfig {
     http.addFilterBefore(subLoginFilter(aManager), UsernamePasswordAuthenticationFilter.class);
     http.addFilterAt(new SubJwtVerifyFilter(aManager), UsernamePasswordAuthenticationFilter.class);
     return http.build();
+  }
+
+  public Filter subAuthrizeFilter(AuthenticationManager authenticationManager) {
+    String LOGIN_URL = "/sub/authorize";
+    RequestMatcher login_requestMatcher = new AntPathRequestMatcher(LOGIN_URL, HttpMethod.GET.name());
+    SubAuthorizeFilter filter = new SubAuthorizeFilter(login_requestMatcher, authenticationManager);
+    filter.setAuthenticationSuccessHandler(new LoginSuccessHandler());
+    filter.setAuthenticationFailureHandler(new LoginFailureHandler());
+    return filter;
   }
 
   public Filter subLoginFilter(AuthenticationManager authenticationManager) {
