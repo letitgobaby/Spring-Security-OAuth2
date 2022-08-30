@@ -11,12 +11,14 @@ public class ConsentToken extends AbstractAuthenticationToken {
   private String clientId;
   private String redirectUri;
   private String code;
+  private String userInfo;
 
-  public ConsentToken(String scope, String clientId, String redirectUri) {
+  public ConsentToken(String scope, String clientId, String redirectUri, String userInfo) {
     super(null);
     this.scope = scope;
     this.clientId = clientId;
     this.redirectUri = redirectUri;
+    this.userInfo = userInfo;
   }
 
   public ConsentToken(Collection<? extends GrantedAuthority> authorities) {
@@ -43,6 +45,10 @@ public class ConsentToken extends AbstractAuthenticationToken {
 
   public String getCode() {
     return this.code;
+  }
+
+  public String getUserInfoToken() {
+    return this.userInfo;
   }
 
   public void setCode(String code) {

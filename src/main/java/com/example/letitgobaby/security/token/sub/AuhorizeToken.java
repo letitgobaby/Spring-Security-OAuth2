@@ -49,8 +49,9 @@ public class AuhorizeToken extends AbstractAuthenticationToken {
     this.code = code;
   }
 
-  public void authenticated() {
+  public AuhorizeToken authenticated() {
     super.setAuthenticated(true);
+    return this;
   }
   
 }

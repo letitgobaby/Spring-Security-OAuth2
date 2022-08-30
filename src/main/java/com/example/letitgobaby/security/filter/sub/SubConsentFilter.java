@@ -31,8 +31,9 @@ public class SubConsentFilter extends AbstractAuthenticationProcessingFilter {
     String clientId = request.getParameter("client_id");
     String redirectUri = request.getParameter("redirect_uri");
     String scope = request.getParameter("scope");
+    String userInfo = request.getParameter("at");
 
-    ConsentToken authentication = new ConsentToken(scope, clientId, redirectUri);
+    ConsentToken authentication = new ConsentToken(scope, clientId, redirectUri, userInfo);
     return super.getAuthenticationManager().authenticate(authentication);
   }
     
@@ -52,4 +53,5 @@ public class SubConsentFilter extends AbstractAuthenticationProcessingFilter {
     log.info("# SubConsentFilter - unsuccessfulAuthentication #", failed.getMessage());
     super.getFailureHandler().onAuthenticationFailure(request, response, failed);
   }
+
 }

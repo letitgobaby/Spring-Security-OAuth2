@@ -40,9 +40,8 @@ public class SubLoginSuccessHandler implements AuthenticationSuccessHandler {
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
     response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
     response.setDateHeader("Expires", 0);
-    new ObjectMapper().writeValue(response.getWriter(), new ApiResult(HttpStatus.OK.value(), "LOGIN").body(body));
-    // response.getWriter().flush();
-    response.sendRedirect("http://"+auth.getRedirectUri());
+    new ObjectMapper().writeValue(response.getWriter(), new ApiResult(HttpStatus.OK.value(), "SUB-LOGIN").body(body));
+    response.getWriter().flush();
   }
   
 }

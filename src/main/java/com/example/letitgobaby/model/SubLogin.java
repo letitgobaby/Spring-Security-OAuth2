@@ -26,13 +26,16 @@ public class SubLogin {
   @Column(name = "client_id")
   private String clientId;
 
-  @Column(name = "client_secret")
-  private String clientSecret;
-
   @Column(name = "redirect_uri")
   private String redirectUri;
 
   @Column(name = "code")
   private String code;
 
+  @Column(name = "user_token")
+  private String userToken;
+
+  @Column(name = "allow_scope")
+  private String allowScope;
+  
 }

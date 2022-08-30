@@ -107,7 +107,7 @@ public class SubSecurityConfig {
   }
 
   public Filter subLoginFilter(AuthenticationManager authenticationManager) {
-    String LOGIN_URL = "/main/login";
+    String LOGIN_URL = "/sub/login";
     RequestMatcher login_requestMatcher = new AntPathRequestMatcher(LOGIN_URL, HttpMethod.POST.name());
     SubLoginFilter filter = new SubLoginFilter(login_requestMatcher, authenticationManager);
     filter.setAuthenticationSuccessHandler(new LoginSuccessHandler());
@@ -117,7 +117,7 @@ public class SubSecurityConfig {
 
   public Filter subTokenFilter(AuthenticationManager authenticationManager) {
     String REQUEST_URL = "/sub/token";
-    RequestMatcher login_requestMatcher = new AntPathRequestMatcher(REQUEST_URL, HttpMethod.GET.name());
+    RequestMatcher login_requestMatcher = new AntPathRequestMatcher(REQUEST_URL, HttpMethod.POST.name());
     SubAuthGrantFilter filter = new SubAuthGrantFilter(login_requestMatcher, authenticationManager);
     filter.setAuthenticationSuccessHandler(new SubLoginSuccessHandler());
     filter.setAuthenticationFailureHandler(new LoginFailureHandler());

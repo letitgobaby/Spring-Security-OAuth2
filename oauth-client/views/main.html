@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link href="css/login-form.css" rel="stylesheet">
+    <script type="text/javascript" src="js/request.js"></script>
+  </head>
+  <body>
+    <div id="app" class="login">
+      <h1>This is Main Page</h1>
+      <div>
+        <h1>Hello</h2>
+        <h1>{{ userName }}</h1>
+      </div>
+      <button @click.prevent="info()">info</button>
+    </div>
+
+    <script type="text/javascript">
+
+      const app = new Vue({
+      el: '#app',
+      data: {
+        userName: ''
+      },
+      methods: {
+
+        info() {
+          get('/info')
+            .then(res => {
+              console.log(res);
+              app.userName = res.data;
+            }).catch(err => console.log(err));
+        }
+      }
+    })
+      
+    </script>
+  </body>
+</html>

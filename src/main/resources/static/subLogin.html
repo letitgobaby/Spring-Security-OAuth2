@@ -5,7 +5,7 @@
   <link rel="stylesheet" href="/css/login.css">
   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script type="text/javascript" src="/js/request.js"></script>
+  <script type="text/javascript" src="/js/sub_request.js"></script>
   <title>Main Login</title>
 </head>
 
@@ -39,8 +39,8 @@
     const app = new Vue({
       el: '#app',
       data: {
-        userId: 'id_for_test',
-        pswd: 'id_for_test',
+        userId: '',
+        pswd: '',
 
         isLogin: false
       },
@@ -52,20 +52,25 @@
             pswd: this.pswd
           }
 
-          location.href = "/sub/consent" + window.location.search;
-          // post('/main/login', body)
-          //   .then(res => {
-          //     alert(res.message);
-          //     console.log(res);
-          //     if (res.status === 200) {
-          //       app.isLogin = true;
-          //     }
-          //     if (res.data.tokenType === 'Bearer') {
-          //       document.cookie = "R_TOKEN=" + res.data.refreshToken;
-          //       tokenStore.access_token = res.data.accessToken;
-          //     }
-          //   })
-          //   .catch(err => console.log(err));
+          post('/sub/login', body)
+            .then(res => {
+              console.log(res);
+              alert(res.message);
+              
+              if (res.data.tokenType === 'Bearer') {
+                var now = new Date();
+                var time = now.getTime();
+                var expireTime = time + 1000*36000;
+                now.setTime(expireTime);
+                document.cookie = "R_TOKEN=" + res.data.refreshToken+";expires="+now.toUTCString()+";";
+                tokenStore.access_token = res.data.accessToken;
+              }
+            })
+            .then(() => {
+              location.href = "/sub/consent" + window.location.search
+                + "&at=" + tokenStore.access_token;
+            })
+            .catch(err => console.log(err));
         },
 
       }

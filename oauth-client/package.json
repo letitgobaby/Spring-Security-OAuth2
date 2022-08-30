@@ -7,6 +7,7 @@
     "go": "babel-node ./app.js"
   },
   "dependencies": {
+    "axios": "^0.27.2",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "ejs": "^3.1.8",
@@ -16,8 +17,8 @@
   },
   "devDependencies": {
     "@babel/cli": "7.13.0",
-    "@babel/core": "7.13.1",
-    "@babel/node": "7.13.0",
+    "@babel/core": "^7.13.1",
+    "@babel/node": "^7.13.0",
     "@babel/preset-env": "7.13.5"
   },
   "babel": {

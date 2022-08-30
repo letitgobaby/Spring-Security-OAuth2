@@ -23,10 +23,14 @@
         <p></p>
         <h2>Consent</h2>
         <p></p>
-        <!-- <input type="text" v-model="userId" class="inputItem" placeholder="Username">
+
         <p></p>
-        <input type="password" v-model="pswd" class="inputItem" placeholder="Password">
-        <p></p> -->
+        <p></p>
+        <p></p>
+        <h1>Scope = {{ scope }}</h1>
+        <p></p>
+        <p></p>
+        <p></p>
         <input type="button" class="buttonItem" value="Consent" @click.prevent="consent()">
       </div>
 
@@ -39,17 +43,15 @@
     const app = new Vue({
       el: '#app',
       data: {
-        userId: 'id_for_test',
-        pswd: 'id_for_test',
-
+        userId: '',
+        pswd: '',
+        scope: 'USER',
         isLogin: false
       },
       methods: {
-
         consent() {
-          location.href = "/sub/code" + window.location.search + "&scope=read";
+          location.href = "/sub/code" + window.location.search + "&scope=" + this.scope;
         }
-
       }
     })
   </script>

@@ -44,26 +44,9 @@ public class SubAuthorizeProvider implements AuthenticationProvider {
       throw new SubAuthenticationException("Not registed Client Id");
     }
 
-    SubLogin subLogin = SubLogin.builder()
-      .clientId(clientInfo.get().getClientId())
-      .redirectUri(token.getRedirectUri())
-      .build();
-    this.subLoginRepository.save(subLogin);
     
-    // SubLogin subLogin = this.subLoginRepository.findByClientId(token.getPrincipal())
-    //   .orElseThrow(() -> new SubAuthenticationException("Not registed Client Id"));
 
-    // if (!subLogin.getRedirectUri().equals(token.getRedirectUri())) {
-    //   throw new SubAuthenticationException("Not Valid Redirect Uri");
-    // }
-
-    // subLogin.setRedirectUri(redirectUri);
-    // subLogin.setCode(randomString());
-    // this.subLoginRepository.save(subLogin);
-
-    // token.setCode(subLogin.getCode());
-    token.authenticated();
-    return token;
+    return token.authenticated();
   }
 
 }

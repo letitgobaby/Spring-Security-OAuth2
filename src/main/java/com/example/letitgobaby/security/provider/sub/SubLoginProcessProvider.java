@@ -55,12 +55,12 @@ public class SubLoginProcessProvider implements AuthenticationProvider {
 
     try {
       UserInfo userInfo = new UserInfo().toDto(user);
-      userInfo.setLoginIp(authToken.getIp());
+      userInfo.setUserRole("TEMP");
 
       String refreshToken = this.tStoreService.setToken(userInfo);
       String accessToken = this.jwtBuilder.accessGenerate(userInfo);
 
-      AuthUserToken authenticated = new AuthUserToken(user.getUserId(), user.getUserRole());
+      AuthUserToken authenticated = new AuthUserToken(user.getUserId(), userInfo.getUserRole());
       authenticated.setToken(accessToken, refreshToken);
       return authenticated;
     } catch (Exception e) {

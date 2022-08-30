@@ -30,7 +30,7 @@ public class SubAuthorizeFilter extends AbstractAuthenticationProcessingFilter {
     String resType = request.getParameter("response_type");
     String clientId = request.getParameter("client_id");
     String redirectUri = request.getParameter("redirect_uri");
-    
+
     AuhorizeToken authentication = new AuhorizeToken(resType, clientId, redirectUri);
     return super.getAuthenticationManager().authenticate(authentication);
   }
@@ -50,6 +50,16 @@ public class SubAuthorizeFilter extends AbstractAuthenticationProcessingFilter {
       AuthenticationException failed) throws IOException, ServletException {
     log.info("# SubAuthorizeFilter - unsuccessfulAuthentication #", failed.getMessage());
     super.getFailureHandler().onAuthenticationFailure(request, response, failed);
+  }
+
+  private String getAuthorization(HttpServletRequest request){
+    String token = request.getHeader("Authorization");
+    if(token == null) {
+      return null;
+    }
+
+    String aToken = token.substring("Bearer ".length());
+    return aToken.length() > 1 ? aToken : null;
   }
 
 }

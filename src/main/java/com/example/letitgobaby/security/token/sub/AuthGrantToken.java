@@ -5,6 +5,8 @@ import java.util.Collection;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 
+import com.example.letitgobaby.security.dto.SubAuthGrantPayload;
+
 public class AuthGrantToken extends AbstractAuthenticationToken {
 
   private String clientId;
@@ -15,6 +17,16 @@ public class AuthGrantToken extends AbstractAuthenticationToken {
 
   private String accessToken;
   private String refreshToken;
+
+  public AuthGrantToken(SubAuthGrantPayload paylod) {
+    super(null);
+    this.clientId = paylod.getClient_id();
+    this.clientSecret = paylod.getClient_secret();
+    this.grantType = paylod.getGrant_type();
+    this.redirectUri = paylod.getRedirect_uri();
+    this.code = paylod.getCode();
+  }
+
 
   public AuthGrantToken(String clientId, String clientSecret, String grantType, String redirectUri, String code) {
     super(null);

@@ -10,4 +10,6 @@ public interface SubLoginRepository extends JpaRepository<SubLogin, Long> {
   
   Optional<SubLogin> findByClientId(String clientId);
 
+  Optional<SubLogin> findByClientIdAndCode(String clientId, String code);
+
 }

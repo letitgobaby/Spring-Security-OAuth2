@@ -1,6 +1,7 @@
 package com.example.letitgobaby.security.filter.sub;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -12,8 +13,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.util.StreamUtils;
 
+import com.example.letitgobaby.security.dto.SubAuthGrantPayload;
 import com.example.letitgobaby.security.token.sub.AuthGrantToken;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,13 +32,10 @@ public class SubAuthGrantFilter extends AbstractAuthenticationProcessingFilter {
   @Override
   public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) 
       throws AuthenticationException, IOException, ServletException {
-    String client_id = request.getParameter("client_id");
-    String client_secret = request.getParameter("client_secret");
-    String grant_type = request.getParameter("grant_type");
-    String redirect_uri = request.getParameter("redirect_uri");
-    String code = request.getParameter("code");
+    String requestBody = StreamUtils.copyToString(request.getInputStream(), Charset.forName("UTF-8"));
+    SubAuthGrantPayload paylod = new ObjectMapper().readValue(requestBody, SubAuthGrantPayload.class);
 
-    AuthGrantToken authentication = new AuthGrantToken(client_id, client_secret, grant_type, redirect_uri, code);
+    AuthGrantToken authentication = new AuthGrantToken(paylod);
     return super.getAuthenticationManager().authenticate(authentication);
   }
 

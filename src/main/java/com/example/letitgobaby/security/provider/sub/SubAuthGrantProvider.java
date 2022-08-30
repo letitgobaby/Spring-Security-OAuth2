@@ -56,26 +56,26 @@ public class SubAuthGrantProvider implements AuthenticationProvider {
     ClientInfo client = this.clientRepository.findByClientId(authToken.getPrincipal())
       .orElseThrow(() -> new SubAuthenticationException("Not found Client ID"));
 
-    if (!this.encoder.matches(client.getClientSecret(), authToken.getCredentials())) {
+    if (!this.encoder.matches(authToken.getCredentials(), client.getClientSecret())) {
       throw new SubAuthenticationException("Not Match ID and Secret");
     }
 
-    SubLogin subLogin = this.subLoginRepository.findByClientId(authToken.getPrincipal())
+    SubLogin subLogin = this.subLoginRepository.findByClientIdAndCode(authToken.getPrincipal(), authToken.getCode())
       .orElseThrow(() -> new SubAuthenticationException("Not found Client ID"));
 
-    if (!subLogin.getClientSecret().equals(authToken.getCode())) {
+    if (!subLogin.getCode().equals(authToken.getCode())) {
       throw new SubAuthenticationException("Not Match Authorization Code");
     }
     
-    // Should do Encode Data !!!!, it's just for Test
-    String userId = authToken.getCode(); // CODE = User ID + role
+    
+    UserInfo userToken = this.jwtBuilder.getClaim(subLogin.getUserToken(), "userInfo").as(UserInfo.class);
 
-    User user = this.userRepository.findByUserId(userId)
+    User user = this.userRepository.findByUserId(userToken.getUserId())
       .orElseThrow(() -> new SubAuthenticationException("User Not Found"));
 
     try {
       UserInfo userInfo = new UserInfo().toDto(user);
-      userInfo.setUserRole("SUB_USER");
+      userInfo.setUserRole(subLogin.getAllowScope());
 
       String refreshToken = this.tStoreService.setToken(userInfo);
       String accessToken = this.jwtBuilder.accessGenerate(userInfo);

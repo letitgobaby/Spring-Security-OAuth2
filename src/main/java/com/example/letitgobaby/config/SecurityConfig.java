@@ -39,9 +39,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class SecurityConfig {
   
-  private final String[] RESOURCE_URL = new String[] { "/static/**", "/favicon.ico", "/js/**", "/images/**", "/css/**", "/fonts/**" };
-  private final String[] AUTHENTICATE_PERMIT_URL = new String[] { "/main/login", "/user/signUp", "/refresh/token" };
-  private final String[] PERMIT_URL = new String[] { "/login", "/fail", "/test", "/h2", "/h2/**", "/user/test" };
+  private final String[] RESOURCE_URL = new String[] { "/static/**", "/favicon.ico", "/js/**", "/images/**", "/css/**", "/fonts/**", "/h2", "/h2/**" };
+  private final String[] AUTHENTICATE_PERMIT_URL = new String[] { "/main/login", "/user/signUp", "/refresh/token", "/test/**" };
+  private final String[] PERMIT_URL = new String[] { "/login", "/test", "/user/test" };
 
   private final LoginProcessProvider loginProvider;
   private final JwtVerifyProvider jwtProvider;
