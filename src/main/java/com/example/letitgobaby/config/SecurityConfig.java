@@ -1,5 +1,7 @@
 package com.example.letitgobaby.config;
 
+import java.util.Arrays;
+
 import javax.servlet.Filter;
 import javax.servlet.http.HttpServletResponse;
 
@@ -16,11 +18,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
-import com.example.letitgobaby.security.filter.A_LoginFilter;
-import com.example.letitgobaby.security.filter.B_LoginFilter;
+import com.example.letitgobaby.security.filter.MainLoginFilter;
 import com.example.letitgobaby.security.filter.JwtVerifyFilter;
 import com.example.letitgobaby.security.filter.RefreshTokenFilter;
 import com.example.letitgobaby.security.handler.JwtFailureHandler;
@@ -38,9 +39,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class SecurityConfig {
   
-  private final String[] RESOURCE_URL = new String[] { "/static/**", "/favicon.ico", "/js/**", "/images/**", "/css/**", "/fonts/**" };
-  private final String[] AUTHENTICATE_PERMIT_URL = new String[] { "/main/login", "/user/signUp", "/refresh/token" };
-  private final String[] PERMIT_URL = new String[] { "/login", "/fail", "/test", "/h2", "/h2/**", "/user/test" };
+  private final String[] RESOURCE_URL = new String[] { "/static/**", "/favicon.ico", "/js/**", "/images/**", "/css/**", "/fonts/**", "/h2", "/h2/**" };
+  private final String[] AUTHENTICATE_PERMIT_URL = new String[] { "/main/login", "/user/signUp", "/refresh/token", "/test/**" };
+  private final String[] PERMIT_URL = new String[] { "/login", "/test", "/user/test" };
 
   private final LoginProcessProvider loginProvider;
   private final JwtVerifyProvider jwtProvider;
@@ -52,39 +53,41 @@ public class SecurityConfig {
   }
 
   @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+  public SecurityFilterChain mainfilterChain(HttpSecurity http) throws Exception {
 
     http.httpBasic().disable();
-    http.cors();
+    http.cors().configurationSource(mainCorsConfig());
     http.csrf().disable();
     http.headers().frameOptions().sameOrigin();
+    http.sessionManagement(sseion -> sseion.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
 
     http
-      .sessionManagement(sseion -> sseion.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+      .antMatcher("/**")
       .authorizeHttpRequests(authorize -> {
         authorize
           .antMatchers(AUTHENTICATE_PERMIT_URL).permitAll()
           .antMatchers(PERMIT_URL).permitAll()
           .antMatchers("/user/auth/test").hasAnyRole("USER")
           .anyRequest().authenticated();
-      })
-      .exceptionHandling()
-      .authenticationEntryPoint((req, res, ex) -> {
-        log.error("authenticationEntryPoint " + ex.getClass().getName() + " = " + ex.getMessage());
+      });
+
+    
+    http.exceptionHandling((handle) -> {
+      handle.authenticationEntryPoint((req, res, ex) -> {
         res.sendRedirect("/login");
-      })
-      .accessDeniedHandler((req, res, ex) -> {
-        log.error("accessDeniedHandler - " + ex.getClass().getName() + " = " + ex.getMessage());
+      });
+      handle.accessDeniedHandler((req, res, ex) -> {
         res.sendError(HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage());
       });
+    });
 
 
     AuthenticationManagerBuilder authManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
     AuthenticationManager aManager = toProviders(authManagerBuilder);
     http.authenticationManager(aManager);
 
-    http.addFilterBefore(a_LoginFilter(aManager), UsernamePasswordAuthenticationFilter.class);
-    // http.addFilterBefore(b_LoginFilter(aManager), UsernamePasswordAuthenticationFilter.class);
+    http.addFilterBefore(mainLoginFilter(aManager), UsernamePasswordAuthenticationFilter.class);
     http.addFilterBefore(reGenFilter(aManager), UsernamePasswordAuthenticationFilter.class);
     http.addFilterAt(jwtFilter(aManager), UsernamePasswordAuthenticationFilter.class);
 
@@ -92,23 +95,14 @@ public class SecurityConfig {
   }
 
 
-  public Filter a_LoginFilter(AuthenticationManager authenticationManager) {
+  public Filter mainLoginFilter(AuthenticationManager authenticationManager) {
     String LOGIN_URL = "/main/login";
     RequestMatcher login_requestMatcher = new AntPathRequestMatcher(LOGIN_URL, HttpMethod.POST.name());
-    A_LoginFilter filter = new A_LoginFilter(login_requestMatcher, authenticationManager);
+    MainLoginFilter filter = new MainLoginFilter(login_requestMatcher, authenticationManager);
     filter.setAuthenticationSuccessHandler(new LoginSuccessHandler());
     filter.setAuthenticationFailureHandler(new LoginFailureHandler());
     return filter;
   }
-
-  // public Filter b_LoginFilter(AuthenticationManager authenticationManager) {
-  //   String LOGIN_URL = "/b/login";
-  //   RequestMatcher login_requestMatcher = new AntPathRequestMatcher(LOGIN_URL, HttpMethod.GET.name());
-  //   B_LoginFilter filter = new B_LoginFilter(login_requestMatcher, authenticationManager);
-  //   filter.setAuthenticationSuccessHandler(new LoginSuccessHandler());
-  //   filter.setAuthenticationFailureHandler(new LoginFailureHandler());
-  //   return filter;
-  // }
 
   public Filter reGenFilter(AuthenticationManager authenticationManager) {
     String LOGIN_URL = "/refresh/token";
@@ -135,16 +129,16 @@ public class SecurityConfig {
   }
 
 
-  @Bean
-  public CorsFilter corsFilter() {
+
+  public CorsConfigurationSource mainCorsConfig() {
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     CorsConfiguration config = new CorsConfiguration();
     config.setAllowCredentials(true);
+    config.setAllowedMethods(Arrays.asList("OPTIONS", "GET", "POST", "PUT", "PATCH", "HEAD"));
     config.addAllowedOrigin("*");
-    config.addAllowedHeader("*");
-    config.addAllowedMethod("*");
+    config.addAllowedHeader("Authorization");
     source.registerCorsConfiguration("/**", config);
-    return new CorsFilter(source);
+    return source;
   }
 
 }

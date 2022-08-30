@@ -83,3 +83,12 @@ const refreshAccessToken = () => {
     .catch(err => reject(err));
   });
 }
+
+(async () => {
+  const tokenBody = await refreshAccessToken();
+  console.log('1@#!@#!@#!@#', tokenBody);
+  if (tokenBody) {
+    tokenStore.access_token = tokenBody.accessToken;
+    document.cookie = "R_TOKEN=" + tokenBody.refreshToken;
+  }
+})();

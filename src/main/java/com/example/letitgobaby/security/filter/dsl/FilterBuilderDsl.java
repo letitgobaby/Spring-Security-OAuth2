@@ -10,8 +10,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
-import com.example.letitgobaby.security.filter.A_LoginFilter;
-import com.example.letitgobaby.security.filter.B_LoginFilter;
+import com.example.letitgobaby.security.filter.MainLoginFilter;
+import com.example.letitgobaby.security.filter.sub.SubAuthGrantFilter;
 import com.example.letitgobaby.security.filter.JwtVerifyFilter;
 import com.example.letitgobaby.security.handler.LoginFailureHandler;
 import com.example.letitgobaby.security.handler.LoginSuccessHandler;
@@ -32,7 +32,7 @@ public class FilterBuilderDsl extends AbstractHttpConfigurer<FilterBuilderDsl, H
   public Filter a_LoginFilter(AuthenticationManager authenticationManager) {
     String LOGIN_URL = "/a/login";
     RequestMatcher login_requestMatcher = new AntPathRequestMatcher(LOGIN_URL, HttpMethod.POST.name());
-    A_LoginFilter filter = new A_LoginFilter(login_requestMatcher, authenticationManager);
+    MainLoginFilter filter = new MainLoginFilter(login_requestMatcher, authenticationManager);
     filter.setAuthenticationSuccessHandler(new LoginSuccessHandler());
     filter.setAuthenticationFailureHandler(new LoginFailureHandler());
     return filter;
@@ -41,7 +41,7 @@ public class FilterBuilderDsl extends AbstractHttpConfigurer<FilterBuilderDsl, H
   public Filter b_LoginFilter(AuthenticationManager authenticationManager) {
     String LOGIN_URL = "/b/login";
     RequestMatcher login_requestMatcher = new AntPathRequestMatcher(LOGIN_URL, HttpMethod.GET.name());
-    B_LoginFilter filter = new B_LoginFilter(login_requestMatcher, authenticationManager);
+    SubAuthGrantFilter filter = new SubAuthGrantFilter(login_requestMatcher, authenticationManager);
     filter.setAuthenticationSuccessHandler(new LoginSuccessHandler());
     filter.setAuthenticationFailureHandler(new LoginFailureHandler());
     return filter;

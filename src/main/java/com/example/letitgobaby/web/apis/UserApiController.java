@@ -32,8 +32,8 @@ public class UserApiController {
 
   @GetMapping("/info")
   public ResponseEntity<ApiResult> getAuthenticatedUserInfo(Authentication auth) {
-    ApiResult result = new ApiResult(HttpStatus.OK.value(), "Authenticated User Info").body(auth.getPrincipal());
-
+    ApiResult result = new ApiResult(HttpStatus.OK.value(), "Authenticated User Info")
+      .body(auth.getPrincipal());
     return ResponseEntity.ok(result);
   }
 
@@ -44,23 +44,5 @@ public class UserApiController {
       .body(newUser);
     return ResponseEntity.ok(result);
   }
-
-  @GetMapping("/test")
-  public ResponseEntity<ApiResult> createUser(String pw) {
-    System.out.println("\n\n");
-    System.out.println(pw + " / " + this.encoder.encode(pw));
-    System.out.println("\n\n");
-    this.userAuthService.createTestUser();
-    return ResponseEntity.ok().build();
-  }
-
-  @GetMapping("/auth/test")
-  public void authTest(Principal principal) {
-    System.out.println("\n\n");
-    System.out.println(principal);
-    System.out.println("\n\n");
-  }
-
   
-
 }

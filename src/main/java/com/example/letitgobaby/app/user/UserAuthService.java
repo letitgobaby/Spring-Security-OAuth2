@@ -39,18 +39,19 @@ public class UserAuthService {
   }
 
   @Transactional
-  public void createTestUser() {
+  public User createTestUser() {
     Optional<User> user = this.userRepository.findByUserId("123");
-    if (!user.isPresent()) {
-      User entity = User.builder()
+    if (user.isPresent()) {  
+      return null; 
+    }
+
+    User entity = User.builder()
       .userId("123")
       .userName("123")
       .password(this.encoder.encode("123"))
       .userRole("USER")
       .build();
-  
-      this.userRepository.save(entity);
-    }
+    return this.userRepository.save(entity);
   }
 
 }

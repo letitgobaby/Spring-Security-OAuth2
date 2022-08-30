@@ -42,13 +42,9 @@ public class JwtVerifyProvider implements AuthenticationProvider {
 
       if (this.jwtBuilder.validate(token)) {
         UserInfo userInfo = this.jwtBuilder.getClaim(token, "userInfo").as(UserInfo.class);
-
-        // 로그인 한 곳과 같은 IP만 인증처리
-        if (userInfo.getLoginIp().equals(jwtToken.getIp())) {
-          List<GrantedAuthority> roles = new ArrayList<GrantedAuthority>();
-          roles.add(new SimpleGrantedAuthority("ROLE_USER"));
-          return new AuthUserToken(userInfo.getUserId(), roles);
-        }
+        List<GrantedAuthority> roles = new ArrayList<GrantedAuthority>();
+        roles.add(new SimpleGrantedAuthority("ROLE_USER"));
+        return new AuthUserToken(userInfo.getUserId(), roles);
       }
 
       return null;
