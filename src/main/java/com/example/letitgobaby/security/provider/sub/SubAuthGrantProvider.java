@@ -9,6 +9,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.example.letitgobaby.app.tokenStore.TokenStoreService;
+import com.example.letitgobaby.model.ClientInfo;
+import com.example.letitgobaby.model.ClientInfoRepository;
 import com.example.letitgobaby.model.SubLogin;
 import com.example.letitgobaby.model.SubLoginRepository;
 import com.example.letitgobaby.model.TokenStore;
@@ -33,6 +35,7 @@ public class SubAuthGrantProvider implements AuthenticationProvider {
   
   private final UserRepository userRepository;
   private final SubLoginRepository subLoginRepository;
+  private final ClientInfoRepository clientRepository;
   private final TokenStoreService tStoreService;
   private final JWTBuilder jwtBuilder;
   private final PasswordEncoder encoder;
@@ -50,13 +53,20 @@ public class SubAuthGrantProvider implements AuthenticationProvider {
       throw new SubAuthenticationException("Grant Type Not Allowed");
     }
 
+    ClientInfo client = this.clientRepository.findByClientId(authToken.getPrincipal())
+      .orElseThrow(() -> new SubAuthenticationException("Not found Client ID"));
+
+    if (!this.encoder.matches(client.getClientSecret(), authToken.getCredentials())) {
+      throw new SubAuthenticationException("Not Match ID and Secret");
+    }
+
     SubLogin subLogin = this.subLoginRepository.findByClientId(authToken.getPrincipal())
       .orElseThrow(() -> new SubAuthenticationException("Not found Client ID"));
 
-    // if (!this.encoder.matches(subLogin.getClientSecret(), authToken.getCredentials())) {
-    //   throw new SubAuthenticationException("Not Match ID and Secret");
-    // }
-
+    if (!subLogin.getClientSecret().equals(authToken.getCode())) {
+      throw new SubAuthenticationException("Not Match Authorization Code");
+    }
+    
     // Should do Encode Data !!!!, it's just for Test
     String userId = authToken.getCode(); // CODE = User ID + role
 

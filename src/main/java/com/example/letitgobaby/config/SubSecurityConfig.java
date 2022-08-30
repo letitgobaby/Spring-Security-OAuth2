@@ -25,7 +25,7 @@ import com.example.letitgobaby.security.filter.sub.SubAuthorizeFilter;
 import com.example.letitgobaby.security.filter.sub.SubConsentFilter;
 import com.example.letitgobaby.security.filter.sub.SubJwtVerifyFilter;
 import com.example.letitgobaby.security.filter.sub.SubLoginFilter;
-import com.example.letitgobaby.security.filter.sub.SubTokenFilter;
+import com.example.letitgobaby.security.filter.sub.SubAuthGrantFilter;
 import com.example.letitgobaby.security.handler.LoginFailureHandler;
 import com.example.letitgobaby.security.handler.LoginSuccessHandler;
 import com.example.letitgobaby.security.handler.SubLoginSuccessHandler;
@@ -118,7 +118,7 @@ public class SubSecurityConfig {
   public Filter subTokenFilter(AuthenticationManager authenticationManager) {
     String REQUEST_URL = "/sub/token";
     RequestMatcher login_requestMatcher = new AntPathRequestMatcher(REQUEST_URL, HttpMethod.GET.name());
-    SubTokenFilter filter = new SubTokenFilter(login_requestMatcher, authenticationManager);
+    SubAuthGrantFilter filter = new SubAuthGrantFilter(login_requestMatcher, authenticationManager);
     filter.setAuthenticationSuccessHandler(new SubLoginSuccessHandler());
     filter.setAuthenticationFailureHandler(new LoginFailureHandler());
     return filter;

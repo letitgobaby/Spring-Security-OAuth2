@@ -19,9 +19,9 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
-public class SubTokenFilter extends AbstractAuthenticationProcessingFilter {
+public class SubAuthGrantFilter extends AbstractAuthenticationProcessingFilter {
 
-  public SubTokenFilter(RequestMatcher requestMatcher, AuthenticationManager authenticationManager) {
+  public SubAuthGrantFilter(RequestMatcher requestMatcher, AuthenticationManager authenticationManager) {
     super(requestMatcher, authenticationManager);
   }
 
