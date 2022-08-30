@@ -11,7 +11,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import com.example.letitgobaby.security.filter.MainLoginFilter;
-import com.example.letitgobaby.security.filter.sub.SubLoginFilter;
+import com.example.letitgobaby.security.filter.sub.SubTokenFilter;
 import com.example.letitgobaby.security.filter.JwtVerifyFilter;
 import com.example.letitgobaby.security.handler.LoginFailureHandler;
 import com.example.letitgobaby.security.handler.LoginSuccessHandler;
@@ -41,7 +41,7 @@ public class FilterBuilderDsl extends AbstractHttpConfigurer<FilterBuilderDsl, H
   public Filter b_LoginFilter(AuthenticationManager authenticationManager) {
     String LOGIN_URL = "/b/login";
     RequestMatcher login_requestMatcher = new AntPathRequestMatcher(LOGIN_URL, HttpMethod.GET.name());
-    SubLoginFilter filter = new SubLoginFilter(login_requestMatcher, authenticationManager);
+    SubTokenFilter filter = new SubTokenFilter(login_requestMatcher, authenticationManager);
     filter.setAuthenticationSuccessHandler(new LoginSuccessHandler());
     filter.setAuthenticationFailureHandler(new LoginFailureHandler());
     return filter;

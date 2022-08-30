@@ -1,8 +1,8 @@
 const axiosApiInstance = axios.create();
 
 let tokenStore = {
-  access_token: '',
-  refresh_token: ''
+  access_token: null,
+  refresh_token: null
 }
 
 
@@ -10,11 +10,14 @@ let tokenStore = {
 axiosApiInstance.interceptors.request.use(
   async config => {
     console.log('request interceptior', config);
-    config.headers = { 
-      'Authorization': `Bearer ${tokenStore.access_token}`,
-      'Accept': 'application/json',
-      'Content-Type': 'application/x-www-form-urlencoded'
+    if (tokenStore.access_token) {
+      config.headers = { 
+        'Authorization': `Bearer ${tokenStore.access_token}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
     }
+
     return config;
   },
   error => Promise.reject(error)

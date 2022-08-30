@@ -53,9 +53,10 @@ public class JwtVerifyFilter extends OncePerRequestFilter {
   private String getAuthorization(HttpServletRequest request){
     String token = request.getHeader("Authorization");
     if(token == null) {
-        return null;
+      return null;
     }
 
-    return token.substring("Bearer ".length());
+    String aToken = token.substring("Bearer ".length());
+    return aToken.length() > 1 ? aToken : null;
   }
 }

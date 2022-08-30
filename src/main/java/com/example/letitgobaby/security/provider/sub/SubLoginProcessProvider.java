@@ -1,5 +1,7 @@
 package com.example.letitgobaby.security.provider.sub;
 
+import java.util.Optional;
+
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -26,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @RequiredArgsConstructor
 public class SubLoginProcessProvider implements AuthenticationProvider {
-  
+    
   private final UserRepository userRepository;
   private final TokenStoreService tStoreService;
   private final JWTBuilder jwtBuilder;
@@ -39,7 +41,7 @@ public class SubLoginProcessProvider implements AuthenticationProvider {
 
   @Override
   public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-    log.info("## do LoginProcessProvider ##");
+    log.info("## do SubLoginProcessProvider ##");
     LoginToken authToken = (LoginToken) authentication;
     String userId = authToken.getPrincipal();
     String pswd = authToken.getCredentials();
@@ -53,7 +55,7 @@ public class SubLoginProcessProvider implements AuthenticationProvider {
 
     try {
       UserInfo userInfo = new UserInfo().toDto(user);
-      userInfo.setUserRole("SUB");
+      userInfo.setLoginIp(authToken.getIp());
 
       String refreshToken = this.tStoreService.setToken(userInfo);
       String accessToken = this.jwtBuilder.accessGenerate(userInfo);
@@ -66,5 +68,4 @@ public class SubLoginProcessProvider implements AuthenticationProvider {
       return null;
     }
   }
-  
 }

@@ -22,11 +22,18 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.example.letitgobaby.security.filter.sub.SubAuthorizeFilter;
+import com.example.letitgobaby.security.filter.sub.SubConsentFilter;
 import com.example.letitgobaby.security.filter.sub.SubJwtVerifyFilter;
 import com.example.letitgobaby.security.filter.sub.SubLoginFilter;
+import com.example.letitgobaby.security.filter.sub.SubTokenFilter;
 import com.example.letitgobaby.security.handler.LoginFailureHandler;
 import com.example.letitgobaby.security.handler.LoginSuccessHandler;
+import com.example.letitgobaby.security.handler.SubLoginSuccessHandler;
 import com.example.letitgobaby.security.provider.LoginProcessProvider;
+import com.example.letitgobaby.security.provider.sub.SubAuthorizeProvider;
+import com.example.letitgobaby.security.provider.sub.SubConsentProvider;
+import com.example.letitgobaby.security.provider.sub.SubLoginProcessProvider;
+import com.example.letitgobaby.security.provider.sub.SubAuthGrantProvider;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +43,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class SubSecurityConfig {
 
-  private final LoginProcessProvider loginProvider;
+  private final SubLoginProcessProvider loginProvider;
+  private final SubAuthGrantProvider grantProvider;
+  private final SubAuthorizeProvider authorizeProvider;
+  private final SubConsentProvider consentProvider;
 
   @Bean
   @Order(1)
@@ -50,43 +60,66 @@ public class SubSecurityConfig {
 
     http.antMatcher("/sub/**");
     http.authorizeHttpRequests(authorize -> {
-      authorize.anyRequest().permitAll();
+      authorize
+        .antMatchers("/sub/loginpage", "/sub/consent").permitAll()
+        .anyRequest().authenticated();
     });
 
 
     http.exceptionHandling((handle) -> {
+      handle.authenticationEntryPoint((req, res, ex) -> {
+        res.sendRedirect("/sub/authorize?" + req.getQueryString());
+      });
       handle.accessDeniedHandler((req, res, ex) -> {
         res.sendError(HttpStatus.FORBIDDEN.value(), ex.getMessage());
-      });
-      handle.authenticationEntryPoint((req, res, ex) -> {
-        res.sendError(HttpStatus.UNAUTHORIZED.value(), ex.getMessage());
       });
     });
 
     AuthenticationManagerBuilder authManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
     authManagerBuilder.authenticationProvider(loginProvider);
+    authManagerBuilder.authenticationProvider(grantProvider);
+    authManagerBuilder.authenticationProvider(authorizeProvider);
+    authManagerBuilder.authenticationProvider(consentProvider);
     AuthenticationManager aManager = authManagerBuilder.build();
 
     http.authenticationManager(aManager);
-    http.addFilterBefore(subLoginFilter(aManager), UsernamePasswordAuthenticationFilter.class);
-    http.addFilterAt(new SubJwtVerifyFilter(aManager), UsernamePasswordAuthenticationFilter.class);
+    http.addFilterBefore(subAuthrizeFilter(aManager), UsernamePasswordAuthenticationFilter.class);
+    http.addFilterBefore(subConsentFilter(aManager), UsernamePasswordAuthenticationFilter.class);
+    http.addFilterBefore(subTokenFilter(aManager), UsernamePasswordAuthenticationFilter.class);
+    http.addFilterAt(subLoginFilter(aManager), UsernamePasswordAuthenticationFilter.class);
     return http.build();
   }
 
   public Filter subAuthrizeFilter(AuthenticationManager authenticationManager) {
-    String LOGIN_URL = "/sub/authorize";
-    RequestMatcher login_requestMatcher = new AntPathRequestMatcher(LOGIN_URL, HttpMethod.GET.name());
+    String REQUEST_URL = "/sub/authorize";
+    RequestMatcher login_requestMatcher = new AntPathRequestMatcher(REQUEST_URL, HttpMethod.GET.name());
     SubAuthorizeFilter filter = new SubAuthorizeFilter(login_requestMatcher, authenticationManager);
-    filter.setAuthenticationSuccessHandler(new LoginSuccessHandler());
+    filter.setAuthenticationFailureHandler(new LoginFailureHandler());
+    return filter;
+  }
+
+  public Filter subConsentFilter(AuthenticationManager authenticationManager) {
+    String REQUEST_URL = "/sub/code";
+    RequestMatcher login_requestMatcher = new AntPathRequestMatcher(REQUEST_URL, HttpMethod.GET.name());
+    SubConsentFilter filter = new SubConsentFilter(login_requestMatcher, authenticationManager);
     filter.setAuthenticationFailureHandler(new LoginFailureHandler());
     return filter;
   }
 
   public Filter subLoginFilter(AuthenticationManager authenticationManager) {
-    String LOGIN_URL = "/sub/login";
-    RequestMatcher login_requestMatcher = new AntPathRequestMatcher(LOGIN_URL, HttpMethod.GET.name());
+    String LOGIN_URL = "/main/login";
+    RequestMatcher login_requestMatcher = new AntPathRequestMatcher(LOGIN_URL, HttpMethod.POST.name());
     SubLoginFilter filter = new SubLoginFilter(login_requestMatcher, authenticationManager);
     filter.setAuthenticationSuccessHandler(new LoginSuccessHandler());
+    filter.setAuthenticationFailureHandler(new LoginFailureHandler());
+    return filter;
+  }
+
+  public Filter subTokenFilter(AuthenticationManager authenticationManager) {
+    String REQUEST_URL = "/sub/token";
+    RequestMatcher login_requestMatcher = new AntPathRequestMatcher(REQUEST_URL, HttpMethod.GET.name());
+    SubTokenFilter filter = new SubTokenFilter(login_requestMatcher, authenticationManager);
+    filter.setAuthenticationSuccessHandler(new SubLoginSuccessHandler());
     filter.setAuthenticationFailureHandler(new LoginFailureHandler());
     return filter;
   }

@@ -13,6 +13,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import com.example.letitgobaby.security.token.sub.AuhorizeToken;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -25,21 +27,22 @@ public class SubAuthorizeFilter extends AbstractAuthenticationProcessingFilter {
   @Override
   public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
       throws AuthenticationException, IOException, ServletException {
-        // response_type=code
-        // client_id=dple3JolZrc9R877kmADdK9J
-        // redirect_uri=https://www.oauth.com/playground/authorization-code.html
-        // https://velog.io/@0xf4d3c0d3/OAuth-2.0
-        // https://auth0.com/blog/refresh-tokens-what-are-they-and-when-to-use-them/
-        // https://medium.com/typeforms-engineering-blog/the-beginners-guide-to-oauth-dancing-4b8f3666de10
-    return null;
+    String resType = request.getParameter("response_type");
+    String clientId = request.getParameter("client_id");
+    String redirectUri = request.getParameter("redirect_uri");
+    
+    AuhorizeToken authentication = new AuhorizeToken(resType, clientId, redirectUri);
+    return super.getAuthenticationManager().authenticate(authentication);
   }
   
   @Override
   public void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
       Authentication authResult) throws IOException, ServletException {
-    log.info("# SubAuthorizeFilter - successfulAuthentication # " + authResult.getPrincipal());
-    // super.getSuccessHandler().onAuthenticationSuccess(request, response, authResult);
-    response.sendRedirect("");
+    AuhorizeToken authentication = (AuhorizeToken) authResult;
+    log.info("# SubAuthorizeFilter - successfulAuthentication # " + authentication.getPrincipal() + " - " + authentication.getRedirectUri());
+
+    String redirectUrl = "/sub/loginpage?client_id=" + authentication.getPrincipal() + "&redirect_uri=" + authentication.getRedirectUri();
+    response.sendRedirect(redirectUrl);
   }
 
   @Override

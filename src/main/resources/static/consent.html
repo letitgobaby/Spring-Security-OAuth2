@@ -1,0 +1,57 @@
+<html>
+<head>
+  <meta charset=utf-8>
+  <meta name="description" content="CSS Tabs" />
+  <link rel="stylesheet" href="/css/login.css">
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script type="text/javascript" src="/js/request.js"></script>
+  <title>Main Login</title>
+</head>
+
+<body>
+  <div id="app" class="tabbed">
+
+
+    <input type="radio" name="tabs" id="tab-nav-1" checked>
+    <label for="tab-nav-1">Consent</label>
+
+    <input type="radio" name="tabs" id="tab-nav-4">
+
+    <div class="tabs">
+      <div>
+        <p></p>
+        <h2>Consent</h2>
+        <p></p>
+        <!-- <input type="text" v-model="userId" class="inputItem" placeholder="Username">
+        <p></p>
+        <input type="password" v-model="pswd" class="inputItem" placeholder="Password">
+        <p></p> -->
+        <input type="button" class="buttonItem" value="Consent" @click.prevent="consent()">
+      </div>
+
+    </div>
+  
+  </div>
+
+
+  <script>
+    const app = new Vue({
+      el: '#app',
+      data: {
+        userId: 'id_for_test',
+        pswd: 'id_for_test',
+
+        isLogin: false
+      },
+      methods: {
+
+        consent() {
+          location.href = "/sub/code" + window.location.search + "&scope=read";
+        }
+
+      }
+    })
+  </script>
+</body>
+</html>
