@@ -49,11 +49,12 @@ public class RefreshTokenFilter extends AbstractAuthenticationProcessingFilter {
   }
   
   private String getCookieValue(HttpServletRequest req, String cookieName) {
+    if (req.getCookies() == null) return null;
     return Arrays.stream(req.getCookies())
       .filter(c -> c.getName().equals(cookieName))
       .findFirst()
       .map(Cookie::getValue)
       .orElse(null);
-}
+  }
 
 }

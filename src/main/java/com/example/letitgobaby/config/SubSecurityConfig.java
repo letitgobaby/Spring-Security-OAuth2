@@ -31,6 +31,7 @@ import com.example.letitgobaby.security.handler.LoginSuccessHandler;
 import com.example.letitgobaby.security.handler.SubLoginSuccessHandler;
 import com.example.letitgobaby.security.provider.LoginProcessProvider;
 import com.example.letitgobaby.security.provider.sub.SubAuthorizeProvider;
+import com.example.letitgobaby.security.provider.sub.SubAutoLoginProcessProvider;
 import com.example.letitgobaby.security.provider.sub.SubConsentProvider;
 import com.example.letitgobaby.security.provider.sub.SubLoginProcessProvider;
 import com.example.letitgobaby.security.provider.sub.SubAuthGrantProvider;
@@ -43,6 +44,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class SubSecurityConfig {
 
+  private final SubAutoLoginProcessProvider autoLoginProcessProvider;
   private final SubLoginProcessProvider loginProvider;
   private final SubAuthGrantProvider grantProvider;
   private final SubAuthorizeProvider authorizeProvider;
@@ -76,6 +78,7 @@ public class SubSecurityConfig {
     });
 
     AuthenticationManagerBuilder authManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
+    authManagerBuilder.authenticationProvider(autoLoginProcessProvider);
     authManagerBuilder.authenticationProvider(loginProvider);
     authManagerBuilder.authenticationProvider(grantProvider);
     authManagerBuilder.authenticationProvider(authorizeProvider);

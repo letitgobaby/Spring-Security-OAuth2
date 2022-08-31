@@ -44,8 +44,6 @@ public class SubAuthorizeProvider implements AuthenticationProvider {
       throw new SubAuthenticationException("Not registed Client Id");
     }
 
-    
-
     return token.authenticated();
   }
 

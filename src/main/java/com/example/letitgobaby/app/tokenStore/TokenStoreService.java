@@ -34,19 +34,10 @@ public class TokenStoreService {
   public String setToken(UserInfo userInfo) throws Exception {
     String refreshToken = this.jwtBuilder.refreshGenerate(userInfo);
 
-    TokenStore entity = null;
-    Optional<TokenStore> tStore = this.tStoreRepository.findByUserId(userInfo.getUserId());
-    if (tStore.isPresent()) {
-      tStore.get().setObjectKey(randomString());
-      tStore.get().setObjectValue(refreshToken);
-      entity = tStore.get();
-    } else {
-      entity = new TokenStore().builder()
-        .userId(userInfo.getUserId())
-        .objectKey(randomString()).objectValue(refreshToken)
-        .build();
-    }
-
+    TokenStore entity = TokenStore.builder()
+      .userId(userInfo.getUserId())
+      .objectKey(randomString()).objectValue(refreshToken)
+      .build();
     this.tStoreRepository.save(entity);
     return entity.getObjectKey();
   }

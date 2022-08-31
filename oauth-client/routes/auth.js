@@ -15,7 +15,9 @@ router.get('/main', (req, res, next) => {
 });
 
 router.get('/auth/a', (req, res, next) => {
-  if (req.query.code) {
+  if (req.query.error) {
+    res.redirect('/login');
+  } else if (req.query.code) {
     axios.post('http://localhost:8081/sub/token', {
       grant_type, client_id, client_secret, redirect_uri,
       code: req.query.code

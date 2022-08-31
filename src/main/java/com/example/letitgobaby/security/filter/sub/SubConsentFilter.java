@@ -42,7 +42,6 @@ public class SubConsentFilter extends AbstractAuthenticationProcessingFilter {
       Authentication authResult) throws IOException, ServletException {
         ConsentToken authentication = (ConsentToken) authResult;
     log.info("# SubConsentFilter - successfulAuthentication # " + authentication.getPrincipal() + " - " + authentication.getRedirectUri());
-
     String redirectUrl = authentication.getRedirectUri() + "?code=" + authentication.getCode();
     response.sendRedirect(redirectUrl);
   }
