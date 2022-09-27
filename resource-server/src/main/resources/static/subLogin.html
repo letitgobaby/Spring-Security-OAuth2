@@ -1,0 +1,80 @@
+<html>
+<head>
+  <meta charset=utf-8>
+  <meta name="description" content="CSS Tabs" />
+  <link rel="stylesheet" href="/css/login.css">
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script type="text/javascript" src="/js/sub_request.js"></script>
+  <title>Main Login</title>
+</head>
+
+<body>
+  <div id="app" class="tabbed">
+
+    <h1>{{ isLogin ? 'login!!' : 'hello' }}</h1>
+
+
+    <input type="radio" name="tabs" id="tab-nav-1" checked>
+    <label for="tab-nav-1">Log in</label>
+
+    <input type="radio" name="tabs" id="tab-nav-4">
+
+    <div class="tabs">
+      <div>
+        <h2>Log in</h2>
+        <input type="text" v-model="userId" class="inputItem" placeholder="Username">
+        <p></p>
+        <input type="password" v-model="pswd" class="inputItem" placeholder="Password">
+        <p></p>
+        <input type="button" class="buttonItem" value="Log in" @click.prevent="login()">
+      </div>
+
+    </div>
+  
+  </div>
+
+
+  <script>
+    const app = new Vue({
+      el: '#app',
+      data: {
+        userId: '',
+        pswd: '',
+
+        isLogin: false
+      },
+      methods: {
+
+        login() {
+          const body = {
+            userId: this.userId,
+            pswd: this.pswd
+          }
+
+          post('/sub/login', body)
+            .then(res => {
+              console.log(res);
+              alert(res.message);
+              
+              if (res.data.tokenType === 'Bearer') {
+                var now = new Date();
+                var time = now.getTime();
+                var expireTime = time + 1000*36000;
+                now.setTime(expireTime);
+                document.cookie = "R_TOKEN=" + res.data.refreshToken+";expires="+now.toUTCString()+";";
+                tokenStore.access_token = res.data.accessToken;
+              }
+            })
+            .then(() => {
+              location.href = "/sub/consent" + window.location.search
+                + "&at=" + tokenStore.access_token;
+            })
+            .catch(err => console.log(err));
+        },
+
+      }
+    })
+  </script>
+</body>
+</html>
